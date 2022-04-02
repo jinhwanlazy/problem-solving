@@ -65,9 +65,11 @@ class CppSolution(Solution):
     def build(self):
         start_time = datetime.now()
         exe_filepath = os.path.join(os.path.dirname(self.filepath), 'a.out')
-        cmd = ['g++-11', '-std=c++17', self.filepath, '-o', exe_filepath]
-        res = subprocess.run(cmd, check=True)
+        cmd = ['g++-11', '-std=c++17', '-Wall', '-Weffc++', self.filepath, '-o', exe_filepath]
+        res = subprocess.run(cmd, check=True, capture_output=True, text=True)
         self.exe_filepath = exe_filepath
+        print(res.stdout)
+        print(res.stderr)
         print(f"build {self.filepath} done - elapsed: {(datetime.now() - start_time)}")
 
     def execute(self, sample):
