@@ -71,16 +71,16 @@ class CppSolution(Solution):
 
     def build(self):
         start_time = datetime.now()
-        cmd = ['g++-11', '-std=c++17', '-Wall', '-Weffc++', self.filepath, '-o',
-                self.exe_filepath]
+        cmd = ['g++-11', '-std=c++17', '-Wall', '-Weffc++',
+                '-fdiagnostics-color=always', self.filepath, '-o', self.exe_filepath]
         res = subprocess.run(cmd, capture_output=True, text=True)
         print(res.stdout)
         print(res.stderr)
-
         if res.returncode != 0:
             raise Exception(f"Filed to execute command {cmd}")
 
         print(f"build {self.filepath} done - elapsed: {(datetime.now() - start_time)}")
+
 
     def execute(self, sample):
         cmd = [self.exe_filepath]
