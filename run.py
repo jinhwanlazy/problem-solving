@@ -26,7 +26,6 @@ class Solution(metaclass=abc.ABCMeta):
         super().__init__()
         self.filepath = filepath
         self.verbose = kwargs.get('verbose', False)
-        self.build()
         
     @abc.abstractmethod
     def build(self):
@@ -34,6 +33,10 @@ class Solution(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def execute(self, test_input):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def clean(self):
         raise NotImplementedError
 
 
@@ -57,19 +60,26 @@ class PySolution(Solution):
         out, _ = proc.communicate(sample.input())
         return out
 
+    def clean(self):
+        None
+
 
 class CppSolution(Solution):
     def __init__(self, filepath, *args, **kwargs):
         super().__init__(filepath, *args, **kwargs)
+        self.exe_filepath = os.path.join(os.path.dirname(self.filepath), 'a.out')
 
     def build(self):
         start_time = datetime.now()
-        exe_filepath = os.path.join(os.path.dirname(self.filepath), 'a.out')
-        cmd = ['g++-11', '-std=c++17', '-Wall', '-Weffc++', self.filepath, '-o', exe_filepath]
-        res = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        self.exe_filepath = exe_filepath
+        cmd = ['g++-11', '-std=c++17', '-Wall', '-Weffc++', self.filepath, '-o',
+                self.exe_filepath]
+        res = subprocess.run(cmd, capture_output=True, text=True)
         print(res.stdout)
         print(res.stderr)
+
+        if res.returncode != 0:
+            raise Exception(f"Filed to execute command {cmd}")
+
         print(f"build {self.filepath} done - elapsed: {(datetime.now() - start_time)}")
 
     def execute(self, sample):
@@ -82,6 +92,9 @@ class CppSolution(Solution):
         if self.verbose and err:
             print(err.decode())
         return out
+
+    def clean(self):
+        os.remove(self.exe_filepath)
 
 
 class TestSample(metaclass=abc.ABCMeta):
@@ -214,6 +227,7 @@ def run_test(problem, language, *args, **kwargs):
 
     solution_filepath = find_solution_file(directory, language)
     solution = create_solution(solution_filepath, *args, **kwargs)
+    solution.build()
     
     samples = find_samples(directory, *args, **kwargs)
     for sample in samples:
@@ -227,6 +241,8 @@ def run_test(problem, language, *args, **kwargs):
             print(f'{sample} failed - elapsed: {elapsed}')
         if (not res or kwargs.get('verbose', False)) and report:
             print(report)
+
+    solution.clean()
 
 
 def main():
