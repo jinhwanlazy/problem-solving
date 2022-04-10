@@ -72,11 +72,12 @@ class CppSolution(Solution):
     def build(self):
         start_time = datetime.now()
         cmd = ['g++', 
-            '-I', '.misc/include', 
+            '-O2',
             '-std=c++17',
             '-Wall', 
             '-Weffc++',
             '-fdiagnostics-color=always', 
+            '-I', '.misc/include', 
             self.filepath, 
             '-o', self.exe_filepath]
         res = subprocess.run(cmd, capture_output=True, text=True)
