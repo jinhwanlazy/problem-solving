@@ -1,0 +1,82 @@
+snippet main "The main function"
+#include <bits/stdc++.h> 
+using namespace std;
+
+int main()
+{
+	$0
+	return 0;
+}
+endsnippet
+
+snippet readi "read an integer"
+int ${1:N};
+scanf("%d", &$1);
+$0
+endsnippet
+
+snippet readii "read two integers"
+int ${1:N}, ${2:M};
+scanf("%d %d", &$1, &$2);
+$0
+endsnippet
+
+snippet readiii "read three integers"
+int ${1:A}, ${2:B}, ${3:C};
+scanf("%d %d %d", &$1, &$2, &$3);
+$0
+endsnippet
+
+snippet readv "read a vector"
+vector<${1:int}> ${2:xs}(${3:N});
+for (int i = 0; i < $3; ++i) {
+	scanf("%d", &$2[i]);
+}
+$0
+endsnippet
+
+snippet readvv "read a vector of vector"
+vector<vector<${1:int}>> ${2:grid}(${3:N}, vector<$1>(${4:M}));
+for (int i = 0; i < $3; ++i) {
+	for (int j = 0; j < $4; ++j) {
+		scanf("%d", &$2[i][j]);
+	}
+}
+$0
+endsnippet
+
+snippet reads "read a string"
+string ${1:S};
+scanf("%s\n", &$1);
+$0
+endsnippet
+
+
+snippet printi "print an integer"
+printf("%d\n", $1);
+$0
+endsnippet
+
+snippet printii "print two integers"
+printf("%d %d\n", $1, $2);
+$0
+endsnippet
+
+snippet printv "print a vector"
+for (int i = 0; i < $1.size(); ++i) {
+	printf("%d ", $1[i]);
+}
+printf("\n");
+$0
+endsnippet
+
+snippet printvv "print a 2d vector"
+for (int i = 0; i < $1.size(); ++i) {
+	for(int j = 0; j < $1[i].size(); ++j) {
+		printf("%d ", $1[i][j]);
+	}
+	printf("\n");
+}
+printf("\n");
+$0
+endsnippet
