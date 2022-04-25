@@ -66,7 +66,6 @@ snippet printv "print a vector"
 for (int i = 0; i < $1.size(); ++i) {
 	printf("%d ", $1[i]);
 }
-printf("\n");
 $0
 endsnippet
 
@@ -77,6 +76,107 @@ for (int i = 0; i < $1.size(); ++i) {
 	}
 	printf("\n");
 }
-printf("\n");
 $0
 endsnippet
+
+snippet inf "pseudo infinity"
+constexpr static ${1:int} INF = numeric_limits<${1}>::max();
+$0
+endsnippet
+
+snippet dirs "4 directions in grid"
+constexpr static int di[4] = {0, 0, -1, +1};
+constexpr static int dj[4] = {-1, +1, 0, 0};
+$0
+endsnippet
+
+snippet boundcheck "check if value is within bound"
+inline bool boundCheck(int i, int max_i) {
+	return 0 <= i && i < max_i;
+}
+
+inline bool boundCheck(int i, int min_i, int max_i) {
+	return min_i <= i && i < max_i;
+}
+
+endsnippet
+
+snippet boundcheck2 "check if value is within bound"
+inline bool boundCheck(int i, int max_i) {
+	return 0 <= i && i < max_i;
+}
+
+inline bool boundCheck(int i, int min_i, int max_i) {
+	return min_i <= i && i < max_i;
+}
+
+inline bool boundCheck2d(int i, int j, int max_i, int max_j) {
+	return boundCheck(i, max_i) && boundCheck(j, max_j);
+}
+
+inline bool boundCheck2d(int i, int j, int min_i, int min_j, int max_i, int max_j) {
+	return boundCheck(i, min_i, max_i) && boundCheck(j, min_j, max_j);
+}
+endsnippet
+
+snippet boundcheck3 "check if value is within bound"
+inline bool boundCheck(int i, int max_i) {
+	return 0 <= i && i < max_i;
+}
+
+inline bool boundCheck(int i, int min_i, int max_i) {
+	return min_i <= i && i < max_i;
+}
+
+inline bool boundCheck3d(int i, int j, int k, int max_i, int max_j, int max_k) {
+	return boundCheck(i, max_i) && boundCheck(j, max_j) && boundCheck(k, max_k);
+}
+
+inline bool boundCheck3d(int i, int j, int k, int min_i, int min_j, int min_k, int max_i, int max_j, int max_k) {
+	return boundCheck(i, min_i, max_i) && boundCheck(j, min_j, max_j) && boundCheck(k, min_k, max_k);
+}
+endsnippet
+
+snippet dijkstra "dijkstra shortest path algorithm. solution of boj_1504"
+using LL = long long;
+constexpr static int INF = numeric_limits<int>::max();
+
+struct State {
+	int u;
+	int cost;
+
+	friend bool operator<(const State& lhs, const State& rhs) {
+		return lhs.cost > rhs.cost;
+	}
+};
+
+struct Edge {
+	int u;
+	int v;
+	int cost;
+};
+
+LL dijkstra(const vector<vector<Edge>>& edges, int src, int dst) {
+	vector<int> cost(edges.size(), INF);
+	priority_queue<State> Q;
+	cost[src] = 0;
+	Q.push({src, 0});
+	while (!Q.empty()) {
+		auto [u, c] = Q.top(); Q.pop();
+		if (cost[u] < c) {
+			continue;
+		}
+		for (const auto& [_, v, w] : edges[u]) {
+			int next_cost = c + w;
+			if (next_cost < cost[v]) {
+				cost[v] = next_cost;
+				Q.push({v, next_cost});
+			}
+		}
+	}
+	return cost[dst];
+}
+endsnippet
+
+
+
