@@ -137,13 +137,13 @@ inline bool boundCheck3d(int i, int j, int k, int min_i, int min_j, int min_k, i
 }
 endsnippet
 
-snippet algdijkstra "dijkstra shortest path algorithm. solution of boj_1504"
+snippet algdijkstra "dijkstra shortest path algorithm. solution of boj_13913"
 using LL = long long;
 constexpr static int INF = numeric_limits<int>::max();
 
 struct State {
 	int u;
-	int cost;
+	LL cost;
 
 	friend bool operator<(const State& lhs, const State& rhs) {
 		return lhs.cost > rhs.cost;
@@ -153,11 +153,15 @@ struct State {
 struct Edge {
 	int u;
 	int v;
-	int cost;
+	LL cost;
 };
 
-LL dijkstra(const vector<vector<Edge>>& edges, int src, int dst) {
-	vector<int> cost(edges.size(), INF);
+vector<LL> dijkstra(const vector<vector<Edge>>& edges, int src, vector<int> *trace=nullptr) {
+	vector<LL> cost(edges.size(), INF);
+	if (trace) {
+		trace->resize(edges.size());
+		fill(trace->begin(), trace->end(), -1);
+	}
 	priority_queue<State> Q;
 	cost[src] = 0;
 	Q.push({src, 0});
@@ -171,10 +175,13 @@ LL dijkstra(const vector<vector<Edge>>& edges, int src, int dst) {
 			if (next_cost < cost[v]) {
 				cost[v] = next_cost;
 				Q.push({v, next_cost});
+				if (trace) {
+					(*trace)[v] = u;
+				}
 			}
 		}
 	}
-	return cost[dst];
+	return cost;
 }
 endsnippet
 
@@ -205,5 +212,51 @@ vector<LL> bellmanFord(const vector<Edge>& edges, int n_vertices, int src) {
 	return cost;
 }
 
+endsnippet
+
+
+snippet algfloyd "floyd-warshall, shortest path algorithm. solution of boj_11404"
+using LL = long long;
+constexpr static LL INF = numeric_limits<int>::max();
+
+vector<vector<LL>> floydWarshall(const vector<vector<LL>>& adj) {
+	size_t N = adj.size()-1;
+	auto cost = adj;
+
+	for (int k = 1; k <= N; ++k) {
+		for (int i = 1; i <= N; ++i) {
+			for (int j = 1; j <= N; ++j) {
+				if (cost[i][k] != INF && cost[k][j] != INF) {
+					cost[i][j] = min(cost[i][k] + cost[k][j], cost[i][j]);
+				}
+			}
+		}
+	}
+	return cost;
+}
+endsnippet
+
+snippet algsieve "Sieve of Eratosthenes"
+struct Sieve
+{
+	Sieve(size_t max_size) : data_(max_size, true) {
+		data_[0] = false;
+		data_[1] = false;
+		for (size_t i = 2; i < max_size; ++i) {
+			if (!data_[i]) {
+				continue;
+			}
+			for (size_t j = i * 2; j < max_size; j += i) {
+				data_[j] = false;
+			}
+		}
+	}
+	
+	bool isPrime(size_t i) {
+		return data_[i];
+	}
+	
+	vector<bool> data_;
+};
 endsnippet
 
