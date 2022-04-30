@@ -94,7 +94,10 @@ class CppSolution(Solution):
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE)
-        out, err = proc.communicate(sample.input())
+        out, err = proc.communicate(sample.input(), timeout=10)
+        ret_code = proc.wait(timeout=10)
+        if ret_code != 0:
+            raise RuntimeError(f'solution returned wrong ret code: {ret_code}')
         if self.verbose and err:
             print(err.decode())
         return out
