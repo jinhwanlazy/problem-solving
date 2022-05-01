@@ -301,45 +301,67 @@ int LCS(const string& A, const string& B, string* trace=nullptr)
 }
 endsnippet
 
-snippet clsunionfind "Union Find Set data structure. solution of boj_1717"
+snippet clsunionfind "Union Find Set data structure. solution of boj_4195"
 struct UnionFindSet {
-	UnionFindSet(int size) : data_(size), rank_(size, 0) {
+	UnionFindSet(int size) : root_(size), rank_(size, 0), size_(size, 1) {
 		for (int i = 0; i < size; ++i) {
-			data_[i] = i;
+			root_[i] = i;
 		}
 	}
 
 	int find(int i) {
-		if (data_[i] == i) {
+		if (root_[i] == i) {
 			return i;
 		}
-		int root = find(data_[i]);
-		data_[i] = root;
+		int root = find(root_[i]);
+		root_[i] = root;
 		return root;
 	}
 
-	void merge(int i, int j) {
+	int merge(int i, int j) {
 		int i_root = find(i);
 		int j_root = find(j);
 		if (i_root == j_root) {
-			return;
+			return size_[i_root];
 		}
+		if (rank_[i_root] < rank_[j_root]) {
+			root_[i_root] = j_root;
+			size_[j_root] += size_[i_root];
+			size_[i_root] = 0;
+			return size_[j_root];
+		}
+		root_[j_root] = i_root;
+		size_[i_root] += size_[j_root];
+		size_[j_root] = 0;
 		if (rank_[i_root] == rank_[j_root]) {
-			data_[i_root] = j_root;
 			rank_[i_root]++;
 		}
-		else if (rank_[i_root] < rank_[j_root]) {
-			data_[i_root] = j_root;
-		}
-		else {
-			data_[j_root] = i_root;
-		}
+		return size_[i_root];
 	}
 
-	vector<int> data_;
-	vector<int> rank_;
-};
+	bool resize(size_t size) {
+		size_t size_before = root_.size();
 
+		if (size_before >= size) {
+			return false;
+		}
+		root_.resize(size);
+		rank_.resize(size, 0);
+		size_.resize(size, 1);
+		for (int i = size_before; i < size; ++i) {
+			root_[i] = i;
+		}
+		return true;
+	}
+
+	size_t size() const {
+		return root_.size();
+	}
+
+	vector<int> root_;
+	vector<int> rank_;
+	vector<int> size_;
+};
 endsnippet
 
 
