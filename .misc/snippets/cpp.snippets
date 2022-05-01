@@ -66,6 +66,7 @@ snippet printv "print a vector"
 for (int i = 0; i < $1.size(); ++i) {
 	printf("%d ", $1[i]);
 }
+printf("\n");
 $0
 endsnippet
 
@@ -134,6 +135,15 @@ inline bool boundCheck3d(int i, int j, int k, int max_i, int max_j, int max_k) {
 
 inline bool boundCheck3d(int i, int j, int k, int min_i, int min_j, int min_k, int max_i, int max_j, int max_k) {
 	return boundCheck(i, min_i, max_i) && boundCheck(j, min_j, max_j) && boundCheck(k, min_k, max_k);
+}
+endsnippet
+
+snippet stredge "basic edge struct"
+struct Edge
+{
+	int u;
+	int v;
+	${1:int} w; /* cost */
 }
 endsnippet
 
@@ -301,7 +311,7 @@ int LCS(const string& A, const string& B, string* trace=nullptr)
 }
 endsnippet
 
-snippet clsunionfind "Union Find Set data structure. solution of boj_4195"
+snippet algunionfind "Union Find Set data structure. solution of boj_4195"
 struct UnionFindSet {
 	UnionFindSet(int size) : root_(size), rank_(size, 0), size_(size, 1) {
 		for (int i = 0; i < size; ++i) {
@@ -364,4 +374,151 @@ struct UnionFindSet {
 };
 endsnippet
 
+snippet clspoint2 "2D point class"
+class Point2
+{
+	using T = ${1:double};
+
+public:
+	T x;
+	T y;
+
+public:
+	inline Point2& operator= (const Point2& rhs)
+	{
+		x = rhs.x;
+		y = rhs.y;
+		return *this;
+	}
+
+public:
+	inline bool operator==(const Point2& rhs) const
+	{
+		return ((x == rhs.x) && (y == rhs.y));
+	}
+
+	inline bool operator!=(const Point2& rhs) const
+	{
+		return !(operator==(rhs));
+	}
+
+	inline Point2 operator+ (const Point2& rhs) const
+	{
+		return Point2(x + rhs.x, y + rhs.y);
+	}
+
+	inline Point2 operator- (const Point2& rhs) const
+	{
+		return Point2(x - rhs.x, y - rhs.y);
+	}
+
+	inline Point2 operator* (T rhs) const
+	{
+		return Point2(T(x * rhs), T(y * rhs));
+	}
+
+	inline Point2 operator/ (T rhs) const
+	{
+		return Point2(T(x / rhs), T(y / rhs));
+	}
+
+	inline Point2 operator- () const
+	{
+		return Point2(-x, -y);
+	}
+
+	inline Point2& operator+= (const Point2& rhs)
+	{
+		x += rhs.x;
+		y += rhs.y;
+		return *this;
+	}
+
+	inline Point2& operator-= (const Point2& rhs)
+	{
+		x -= rhs.x;
+		y -= rhs.y;
+		return *this;
+	}
+
+	inline Point2& operator*= (T rhs)
+	{
+		x = T(x * rhs);
+		y = T(y * rhs);
+		return *this;
+	}
+
+	inline Point2& operator/= (T rhs)
+	{
+		x = T(x / rhs);
+		y = T(y / rhs);
+		return *this;
+	}
+
+public:
+	inline double norm() const
+	{
+		return sqrt(squaredNorm());
+	}
+
+	inline double squaredNorm() const
+	{
+		return ((x * x) + (y * y));
+	}
+
+	inline double length(const Point2& pos) const
+	{
+		return sqrt(squaredLength(pos));
+	}
+
+	inline double squaredLength(const Point2& pos) const
+	{
+		return (((x - pos.x) * (x - pos.x)) + ((y - pos.y) * (y - pos.y)));
+	}
+
+	inline void normalize()
+	{
+		double l = norm();
+		if (l < numeric_limits<double>::epsilon()) {
+			x = 0;
+			y = 0;
+		}
+		else {
+			x = (T)(x / l);
+			y = (T)(y / l);
+		}
+	}
+
+	inline Point2 normalized() const
+	{
+		Point2 n(*this);
+		n.normalize();
+		return n;
+	}
+
+	public:
+	static const Point2& xAxis() { static Point2 vec(1, 0); return vec; }
+	static const Point2& yAxis() { static Point2 vec(0, 1); return vec; }
+	static const Point2& zero() { static Point2 vec(0, 0); return vec; }
+	friend ostream& operator<< (ostream& ostr, const Point2& rhs) {
+		ostr << "Point2[" << rhs.x << ", " << rhs.y << "]";
+		return ostr;
+	}
+
+	friend istream& operator>> (istream& istr, Point2& rhs) {
+		istr >> rhs.x >> rhs.y;
+		return istr;
+	}
+
+	public:
+	Point2() : x(T(0)), y(T(0)) {}
+
+	Point2(T x_, T y_) : x(x_), y(y_) {}
+
+	Point2(const Point2& rhs) : x(rhs.x), y(rhs.y) {}
+
+	~Point2() {}
+};
+
+endsnippet
 

@@ -3,3 +3,4 @@ a.out*
 tags.lock
 *.gch
 tmp
+.DS_Store
