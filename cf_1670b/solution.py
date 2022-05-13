@@ -21,8 +21,7 @@ def solve():
         return 0
     else:
         return lifes[-1]
-            
-        
 
+            
 for _ in range(int(input())):
     print(solve())

@@ -719,6 +719,11 @@ public:
 	double area() const { return radius * radius * M_PI; }
 
 public:
+	bool contains(const Vec2& rhs) const {
+		Vec2 d = rhs - center;
+		return rhs.squaredLength(center) <= radius * radius;
+	}
+
 	bool contains(const Circle& rhs) const {
 		return radius >= (center.length(rhs.center) + rhs.radius);
 	}
@@ -792,6 +797,43 @@ public:
 	Circle(const Circle& rhs) : center(rhs.center), radius(rhs.radius) {}
 
 	~Circle() {}
+};
+endsnippet
+
+snippet clssquare "2D Square class"
+class Square
+{
+	using T = Vec2::T;
+	
+	T left;
+	T right;
+	T bottom;
+	T top;
+public:
+	inline bool operator==(const Square& rhs) const {
+		return (top == rhs.top && bottom == rhs.bottom && left == rhs.left && right == rhs.right);
+	}
+
+public:
+	T area() const { return (top - bottom) * (right - left); }
+
+public:
+	bool contains(const Vec2& rhs) const {
+		return left <= rhs.x && rhs.x <= right && bottom <= rhs.y && rhs.y <= top;
+	}
+
+public:
+	friend istream& operator>> (istream& istr, Square& rhs) {
+		istr >> rhs.left >> rhs.right >> rhs.bottom >> rhs.top;
+		return istr;
+	}
+
+public:
+	Square() : left(0), right(1), bottom(0), top(1) {}
+
+	Square(T l, T r, T b, T t) : left(l), right(r), bottom(b), top(t) {}
+
+	~Square() {}
 };
 endsnippet
 
