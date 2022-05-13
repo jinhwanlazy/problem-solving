@@ -1,0 +1,6 @@
+[{
+  "directory": "/Users/jinhwanchoi/Workspace/problem_solving",
+  "file": "*/solution.cpp",
+  "output": "a.out",
+  "command": "/usr/bin/clang++ -O2 -std=c++17 -Wall -Weffc++ -fdiagnostics-color=always -I .misc/include"
+}]
