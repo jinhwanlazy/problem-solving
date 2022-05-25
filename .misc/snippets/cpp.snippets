@@ -2,8 +2,10 @@ snippet main "The main function"
 #include <bits/stdc++.h>
 using namespace std;
 
+$0
+
 int main() {
-	$0
+
 	return 0;
 }
 endsnippet
@@ -237,13 +239,14 @@ snippet algfloyd "floyd-warshall, shortest path algorithm. solution of boj_11404
 using LL = long long;
 constexpr static LL INF = numeric_limits<int>::max();
 
-vector<vector<LL>> floydWarshall(const vector<vector<LL>>& adj) {
-	size_t N = adj.size()-1;
+template<typename T>
+vector<vector<T>> floydWarshall(const vector<vector<T>>& adj) {
+	size_t N = adj.size();
 	auto cost = adj;
 
-	for (int k = 1; k <= N; ++k) {
-		for (int i = 1; i <= N; ++i) {
-			for (int j = 1; j <= N; ++j) {
+	for (int k = 0; k < N; ++k) {
+		for (int i = 0; i < N; ++i) {
+			for (int j = 0; j < N; ++j) {
 				if (cost[i][k] != INF && cost[k][j] != INF) {
 					cost[i][j] = min(cost[i][k] + cost[k][j], cost[i][j]);
 				}
@@ -874,5 +877,177 @@ vector<vector<int>> buildTree(const vector<vector<int>>& edges, int root) {
 		}
 	}
 	return tree;
+}
+endsnippet
+
+
+snippet clssegtree "Segment tree class, solution of boj_2042"
+template<typename T>
+class SegTree {
+ private:
+	vector<T> tree_;
+	size_t n_;
+
+ public:
+	template <typename U>
+	SegTree(const size_t size, const U& default_value)
+			: SegTree(vector<U>(size, default_value)) {}
+
+	template <typename U>
+	SegTree(const vector<U>& data) {
+		n_ = data.size();
+		tree_.resize(4 * n_);
+		std::fill(tree_.begin(), tree_.end(), falseValue());
+		init(data, 0, n_ - 1, 1);
+	}
+
+	T query(size_t left, size_t right) {
+		return query(left, right, 1, 0, n_ - 1);
+	}
+
+	template <typename U>
+	T update(size_t idx, const U& new_value) {
+		return update(idx, new_value, 1, 0, n_ - 1);
+	}
+
+ private:
+	template <typename U>
+	T init(const vector<U>& data, size_t left, size_t right, size_t node_idx) {
+		if (left == right) {
+			return tree_[node_idx] = transform(data[left]);
+		}
+		size_t mid = (left + right) / 2;
+		T res_left = init(data, left, mid, node_idx * 2);
+		T res_right = init(data, mid + 1, right, node_idx * 2 + 1);
+		return tree_[node_idx] = aggregate(res_left, res_right);
+	}
+
+	T query(size_t left,
+					size_t right,
+					size_t node_idx,
+					size_t node_left,
+					size_t node_right) {
+		if (right < node_left || node_right < left) {
+			return falseValue();
+		}
+		if (left <= node_left && node_right <= right) {
+			return tree_[node_idx];
+		}
+		size_t mid = (node_left + node_right) / 2;
+		T res_left = query(left, right, node_idx * 2, node_left, mid);
+		T res_right = query(left, right, node_idx * 2 + 1, mid + 1, node_right);
+		return aggregate(res_left, res_right);
+	}
+
+	template <typename U>
+	T update(size_t idx,
+					 const U& new_value,
+					 size_t node_idx,
+					 size_t node_left,
+					 size_t node_right) {
+		if (idx < node_left || node_right < idx) {
+			return tree_[node_idx];
+		}
+		if (node_left == node_right) {
+			return tree_[node_idx] = transform(new_value);
+		}
+		size_t mid = (node_left + node_right) / 2;
+		T res_left = update(idx, new_value, node_idx * 2, node_left, mid);
+		T res_right = update(idx, new_value, node_idx * 2 + 1, mid + 1, node_right);
+		return tree_[node_idx] = aggregate(res_left, res_right);
+	}
+
+	template <typename U>
+	static T transform(const U& v) {
+		return v;
+	}
+
+	static T aggregate(const T& lhs, const T& rhs) { return lhs + rhs; }
+
+	static T falseValue() { return 0; }
+};
+endsnippet
+
+snippet algkmp "KMP, string search algorithm. solution of boj_5525"
+vector<size_t> kmpPartialMatch(const string& query){
+		size_t m = query.size();
+		vector<size_t> pi(m, 0);
+
+		size_t begin = 1, matched = 0;
+		
+		while(begin + matched < m){
+				if(query[begin + matched] == query[matched]){
+						matched++;
+						pi[begin + matched - 1] = matched;
+				}
+				else{
+						if(matched == 0)
+								begin++;
+						else{
+								begin += matched - pi[matched - 1];
+								matched = pi[matched - 1];
+						}
+				}
+		}
+		return pi;
+}
+
+vector<size_t> kmp(const string& source, const string& query) {
+	size_t n = source.size();
+	size_t m = query.size();
+
+	vector<size_t> res;
+	vector<size_t> pi = kmpPartialMatch(query);
+
+	size_t matched = 0;
+	for (int i = 0; i < n; i++)
+	{
+		while (matched > 0 && source[i] != query[matched]) {
+			matched = pi[matched - 1];
+		}
+		if (source[i] == query[matched])
+		{
+			matched++;
+			if (matched == m)
+			{
+				res.push_back(i - m + 1);
+				matched = pi[matched - 1];
+			}
+		}
+	}
+
+	return res;
+}
+endsnippet
+
+snippet algtoposort "topological sort. the solution of boj_2252"
+vector<int> topologicalSort(const vector<vector<int>>& graph) {
+	size_t N = graph.size();
+	vector<int> incomming(N, 0);
+	for (int u = 0; u < graph.size(); ++u) {
+		for (int v : graph[u]) {
+			incomming[v]++;
+		}
+	}
+
+	queue<int> Q;
+	for (int v = 0; v < N; ++v) {
+		if (incomming[v] == 0) {
+			Q.push(v);
+		}
+	}
+
+	vector<int> res;
+	while (!Q.empty()) {
+		int u = Q.front(); Q.pop();
+		res.push_back(u);
+		for (int v : graph[u]) {
+			incomming[v]--;
+			if (incomming[v] == 0) {
+				Q.push(v);
+			}
+		}
+	}
+	return res;
 }
 endsnippet
