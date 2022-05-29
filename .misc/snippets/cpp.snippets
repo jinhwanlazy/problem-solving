@@ -1051,3 +1051,104 @@ vector<int> topologicalSort(const vector<vector<int>>& graph) {
 	return res;
 }
 endsnippet
+
+snippet clssparsetable "Sparse table, datastructure. the solution of boj_17435"
+class SparseTable {
+	vector<vector<int>> table_;
+	int maxDepth_;
+
+ public:
+	SparseTable(const vector<int>& f, int maxDepth = 20)
+			: table_(maxDepth), maxDepth_(maxDepth) {
+		table_[0] = f;
+		for (int i = 1; i < maxDepth; ++i) {
+			const vector<int>& prev = table_[i - 1];
+			vector<int>& row = table_[i];
+			row.resize(prev.size());
+			for (int j = 0; j < row.size(); ++j) {
+				row[j] = prev[prev[j]];
+			}
+		}
+	}
+
+	int query(int n, int x) const {
+		for (int i = 0; i < maxDepth_; ++i) {
+			if ((n >> i) & 1) {
+				x = table_[i][x];
+			}
+		}
+		return x;
+	}
+};
+endsnippet
+
+snippet alglca "lowest common ancestor algorithm, solution of boj_11438"
+class SparseTable {
+	vector<vector<int>> table_;
+	int maxDepth_;
+
+ public:
+	SparseTable(const vector<int>& f, int maxDepth = 20)
+			: table_(maxDepth), maxDepth_(maxDepth) {
+		table_[0] = f;
+		for (int i = 1; i < maxDepth; ++i) {
+			const vector<int>& prev = table_[i - 1];
+			vector<int>& row = table_[i];
+			row.resize(prev.size());
+			for (int j = 0; j < row.size(); ++j) {
+				row[j] = prev[prev[j]];
+			}
+		}
+	}
+
+	SparseTable() {}
+
+	int query(int n, int x) const {
+		for (int i = 0; i < maxDepth_; ++i) {
+			if ((n >> i) & 1) {
+				x = table_[i][x];
+			}
+		}
+		return x;
+	}
+};
+
+class LCA {
+	vector<int> depth_;
+	int logMaxDepth_;
+	SparseTable parent_;
+ public:
+	LCA(const vector<int>& parent, const vector<int>& depth) : depth_(depth) {
+		int maxDepth = 1;
+		for (auto d : depth) {
+			maxDepth = max(d, maxDepth);
+		}
+		logMaxDepth_ = log2(maxDepth) + 2;
+		parent_ = SparseTable(parent, logMaxDepth_);
+	}
+
+	int query(int u, int v) {
+		if (depth_[u] < depth_[v]) {
+			swap(u, v);
+		}
+
+		if (depth_[u] != depth_[v]) {
+			u = parent_.query(depth_[u] - depth_[v], u);
+		}
+
+		for (int i = logMaxDepth_; i >= 0; --i) {
+			int u2 = parent_.query(1<<i, u);
+			int v2 = parent_.query(1<<i, v);
+			if (u2 != v2 && u2 != 0) {
+				u = u2;
+				v = v2;
+			}
+		}
+		if (u != v) {
+			u = parent_.query(1, u);
+			v = parent_.query(1, v);
+		}
+		return u;
+	}
+};
+endsnippet
