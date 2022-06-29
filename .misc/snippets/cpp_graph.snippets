@@ -1,0 +1,474 @@
+snippet clsedge "basic edge struct"
+struct Edge
+{
+	int u;
+	int v;
+	${1:int} w; /* cost */
+
+	friend bool operator< (const Edge& lhs, const Edge& rhs) {
+		return lhs.w > rhs.w;
+	}
+};
+endsnippet
+
+snippet algdijkstra "dijkstra shortest path algorithm. solution of boj_13913"
+using LL = long long;
+constexpr static int INF = numeric_limits<int>::max();
+
+struct State {
+	int u;
+	LL cost;
+
+	friend bool operator<(const State& lhs, const State& rhs) {
+		return lhs.cost > rhs.cost;
+	}
+};
+
+struct Edge {
+	int u;
+	int v;
+	LL cost;
+};
+
+vector<LL> dijkstra(const vector<vector<Edge>>& edges, int src, vector<int> *trace=nullptr) {
+	vector<LL> cost(edges.size(), INF);
+	if (trace) {
+		trace->resize(edges.size());
+		fill(trace->begin(), trace->end(), -1);
+	}
+	priority_queue<State> Q;
+	cost[src] = 0;
+	Q.push({src, 0});
+	while (!Q.empty()) {
+		auto [u, c] = Q.top(); Q.pop();
+		if (cost[u] < c) {
+			continue;
+		}
+		for (const auto& [_, v, w] : edges[u]) {
+			int next_cost = c + w;
+			if (next_cost < cost[v]) {
+				cost[v] = next_cost;
+				Q.push({v, next_cost});
+				if (trace) {
+					(*trace)[v] = u;
+				}
+			}
+		}
+	}
+	return cost;
+}
+endsnippet
+
+snippet algbellman "bellman-ford, shortest path algorithm. solution of boj_11657"
+using LL = long long;
+constexpr static LL INF = numeric_limits<LL>::max();
+
+struct Edge {
+	int u;
+	int v;
+	LL cost;
+};
+
+vector<LL> bellmanFord(const vector<Edge>& edges, int n_vertices, int src) {
+	vector<LL> cost(n_vertices+1, INF);
+	cost[src] = 0;
+
+	for (int i = 1; i <= edges.size(); ++i) {
+		for (const auto& [u, v, c] : edges) {
+			if (cost[u] != INF && cost[v] > cost[u] + c) {
+				cost[v] = cost[u] + c;
+				if (i == edges.size()) {
+					return {};
+				}
+			}
+		}
+	}
+	return cost;
+}
+
+endsnippet
+
+
+snippet algfloyd "floyd-warshall, shortest path algorithm. solution of boj_11404"
+using LL = long long;
+constexpr static LL INF = numeric_limits<int>::max();
+
+template<typename T>
+vector<vector<T>> floydWarshall(const vector<vector<T>>& adj) {
+	size_t N = adj.size();
+	auto cost = adj;
+
+	for (int k = 0; k < N; ++k) {
+		for (int i = 0; i < N; ++i) {
+			for (int j = 0; j < N; ++j) {
+				if (cost[i][k] != INF && cost[k][j] != INF) {
+					cost[i][j] = min(cost[i][k] + cost[k][j], cost[i][j]);
+				}
+			}
+		}
+	}
+	return cost;
+}
+endsnippet
+
+snippet algunionfind "Union Find Set data structure. solution of boj_4195"
+struct UnionFindSet {
+	UnionFindSet(int size) : root_(size), rank_(size, 0), size_(size, 1) {
+		for (int i = 0; i < size; ++i) {
+			root_[i] = i;
+		}
+	}
+
+	int find(int i) {
+		if (root_[i] == i) {
+			return i;
+		}
+		int root = find(root_[i]);
+		root_[i] = root;
+		return root;
+	}
+
+	int merge(int i, int j) {
+		int i_root = find(i);
+		int j_root = find(j);
+		if (i_root == j_root) {
+			return size_[i_root];
+		}
+		if (rank_[i_root] < rank_[j_root]) {
+			root_[i_root] = j_root;
+			size_[j_root] += size_[i_root];
+			size_[i_root] = 0;
+			return size_[j_root];
+		}
+		root_[j_root] = i_root;
+		size_[i_root] += size_[j_root];
+		size_[j_root] = 0;
+		if (rank_[i_root] == rank_[j_root]) {
+			rank_[i_root]++;
+		}
+		return size_[i_root];
+	}
+
+	bool resize(size_t size) {
+		size_t size_before = root_.size();
+
+		if (size_before >= size) {
+			return false;
+		}
+		root_.resize(size);
+		rank_.resize(size, 0);
+		size_.resize(size, 1);
+		for (size_t i = size_before; i < size; ++i) {
+			root_[i] = i;
+		}
+		return true;
+	}
+
+	size_t size() const {
+		return root_.size();
+	}
+
+	vector<int> root_;
+	vector<int> rank_;
+	vector<int> size_;
+};
+endsnippet
+
+snippet algbuildtree "Build tree from a undirected graph and a root index"
+vector<vector<int>> buildTree(const vector<vector<int>>& edges, int root) {
+	int N = edges.size();
+	vector<vector<int>> tree(N);
+	vector<int> visited(N, false);
+	vector<int> st;
+	st.push_back(root);
+	while (!st.empty()) {
+		int u = st.back(); st.pop_back();
+		if (visited[u]) {
+			continue;
+		}
+		visited[u] = true;
+		for (int v : edges[u]) {
+			if (visited[v]) {
+				continue;
+			}
+			tree[u].push_back(v);
+			st.push_back(v);
+		}
+	}
+	return tree;
+}
+endsnippet
+
+snippet algtoposort "topological sort. the solution of boj_2252"
+vector<int> topologicalSort(const vector<vector<int>>& graph) {
+	size_t N = graph.size();
+	vector<int> incomming(N, 0);
+	for (int u = 0; u < graph.size(); ++u) {
+		for (int v : graph[u]) {
+			incomming[v]++;
+		}
+	}
+
+	queue<int> Q;
+	for (int v = 0; v < N; ++v) {
+		if (incomming[v] == 0) {
+			Q.push(v);
+		}
+	}
+
+	vector<int> res;
+	while (!Q.empty()) {
+		int u = Q.front(); Q.pop();
+		res.push_back(u);
+		for (int v : graph[u]) {
+			incomming[v]--;
+			if (incomming[v] == 0) {
+				Q.push(v);
+			}
+		}
+	}
+	return res;
+}
+endsnippet
+
+snippet clssparsetable "Sparse table, datastructure. the solution of boj_17435"
+class SparseTable {
+ public:
+	vector<vector<int>> table_;
+	int maxDepth_;
+
+ public:
+	SparseTable(const vector<int>& f, int maxDepth = 20)
+			: table_(maxDepth), maxDepth_(maxDepth) {
+		table_[0] = f;
+		for (int i = 1; i < maxDepth; ++i) {
+			const vector<int>& prev = table_[i - 1];
+			vector<int>& row = table_[i];
+			row.resize(prev.size());
+			for (int j = 0; j < row.size(); ++j) {
+				row[j] = prev[prev[j]];
+			}
+		}
+	}
+
+	int query(int n, int x) const {
+		for (int i = 0; i < maxDepth_; ++i) {
+			if ((n >> i) & 1) {
+				x = table_[i][x];
+			}
+		}
+		return x;
+	}
+};
+endsnippet
+
+
+snippet alglca "lowest common ancestor algorithm, solution of boj_11438"
+class SparseTable {
+	vector<vector<int>> table_;
+	int maxDepth_;
+
+ public:
+	SparseTable(const vector<int>& f, int maxDepth = 20)
+			: table_(maxDepth), maxDepth_(maxDepth) {
+		table_[0] = f;
+		for (int i = 1; i < maxDepth; ++i) {
+			const vector<int>& prev = table_[i - 1];
+			vector<int>& row = table_[i];
+			row.resize(prev.size());
+			for (int j = 0; j < row.size(); ++j) {
+				row[j] = prev[prev[j]];
+			}
+		}
+	}
+
+	SparseTable() {}
+
+	int query(int n, int x) const {
+		for (int i = 0; i < maxDepth_; ++i) {
+			if ((n >> i) & 1) {
+				x = table_[i][x];
+			}
+		}
+		return x;
+	}
+};
+
+class LCA {
+	vector<int> depth_;
+	int logMaxDepth_;
+	SparseTable parent_;
+ public:
+	LCA(const vector<int>& parent, const vector<int>& depth) : depth_(depth) {
+		int maxDepth = 1;
+		for (auto d : depth) {
+			maxDepth = max(d, maxDepth);
+		}
+		logMaxDepth_ = log2(maxDepth) + 1;
+		parent_ = SparseTable(parent, logMaxDepth_);
+	}
+
+	int query(int u, int v) {
+		if (depth_[u] < depth_[v]) {
+			swap(u, v);
+		}
+
+		if (depth_[u] != depth_[v]) {
+			u = parent_.query(depth_[u] - depth_[v], u);
+		}
+
+		for (int i = logMaxDepth_; i >= 0; --i) {
+			int u2 = parent_.query(1<<i, u);
+			int v2 = parent_.query(1<<i, v);
+			if (u2 != v2 && u2 != 0) {
+				u = u2;
+				v = v2;
+			}
+		}
+		if (u != v) {
+			u = parent_.query(1, u);
+			v = parent_.query(1, v);
+		}
+		return u;
+	}
+};
+endsnippet
+
+snippet algtarjanscc "tarjan's algorithm, find strongly connected components. solution of boj_2150"
+vector<vector<int>> tarjanSCC(const vector<vector<int>>& edges) {
+	struct Vertex {
+		int vid;
+		int index = -1;
+		bool processed = false;
+	};
+	vector<vector<int>> res;
+	stack<Vertex*> S;
+	vector<Vertex> vertices(edges.size());
+	for (int i = 0; i < edges.size(); ++i) {
+		vertices[i].vid = i;
+	}
+	int index = 0;
+
+	function<int(Vertex&)> dfs = [&](Vertex& v) -> int {
+		v.index = index++;
+		S.push(&v);
+		int parent = v.index;
+		for (int nxt : edges[v.vid]) {
+			Vertex& w = vertices[nxt];
+			if (w.index == -1) {
+				parent = min(parent, dfs(w));
+			} else if (!w.processed) {
+				parent = min(parent, w.index);
+			}
+		}
+		if (parent == v.index) {
+			vector<int> newSCC;
+			Vertex* w;
+			do {
+				w = S.top();
+				S.pop();
+				w->processed = true;
+				newSCC.push_back(w->vid);
+			} while (w->vid != v.vid);
+			res.push_back(newSCC);
+		}
+		return parent;
+	};
+
+	for (auto& v : vertices) {
+		if (v.index == -1) {
+			dfs(v);
+		}
+	}
+
+	return res;
+}
+endsnippet
+
+snippet alg2sat "2sat solver. solution of boj_11281"
+vector<bool> twoSAT(const vector<vector<int>>& graph,
+										const function<int(int)>& neg) {
+	auto sccs = tarjanSCC(graph);
+	size_t N = graph.size() / 2;
+
+	vector<int> sccGroup(graph.size());
+	for (int i = 0; i < sccs.size(); ++i) {
+		const auto& scc = sccs[i];
+		for (int j : scc) {
+			sccGroup[j] = i;
+		}
+	}
+
+	for (int i = 0; i < N; ++i) {
+		if (sccGroup[i] == sccGroup[neg(i)]) {
+			return {};
+		}
+	}
+
+	vector<bool> res(N);
+	for (int i = 0; i < res.size(); ++i) {
+		res[i] = sccGroup[i] < sccGroup[neg(i)];
+	}
+	return res;
+}
+endsnippet
+
+snippet algbipartite "bipartite matching algorithm. solution of boj_11375"
+class BipartiteMatching {
+ public:
+	const vector<vector<int>>& edges_;
+	size_t nDst_;
+	vector<int> matches_;
+	vector<bool> visited_;
+
+ public:
+	BipartiteMatching(const vector<vector<int>>& edges, int nDst = -1)
+			: edges_(edges), nDst_(nDst) {
+		if (nDst_ == -1) {
+			for (int i = 0; i < edges.size(); ++i) {
+				for (int w : edges[i]) {
+					nDst_ = max(nDst_, (size_t)(w+1));
+				}
+			}
+		}
+		matches_.resize(nDst, -1);
+		visited_.resize(nDst, false);
+	}
+
+	size_t solve() {
+		size_t res = 0;
+		for (size_t i = 0; i < edges_.size(); ++i) {
+			fill(all(visited_), false);
+			res += dfs(i);
+		}
+		return res;
+	}
+
+	std::vector<std::pair<int, int>> matches() const {
+		std::vector<std::pair<int, int>> res;
+		for (size_t dst = 0; dst < matches_.size(); ++dst) {
+			const auto& src = matches_[dst];
+			if (src != -1) {
+				res.push_back({src, dst});
+			}
+		}
+		return res;
+	}
+
+ private:
+	bool dfs(int src) {
+		for (int dst : edges_[src]) {
+			if (visited_[dst]) {
+				continue;
+			}
+			visited_[dst] = true;
+			if (matches_[dst] == -1 || dfs(matches_[dst])) {
+				matches_[dst] = src;
+				return true;
+			}
+		}
+		return false;
+	}
+};
+endsnippet
+
