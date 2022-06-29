@@ -1,9 +1,11 @@
 snippet main "The main function"
 #include <bits/stdc++.h>
+#define all(x) (x).begin(), (x).end()
+
 using namespace std;
+using LL = long long;
 
 $0
-
 int main() {
 
 	return 0;
@@ -536,6 +538,19 @@ public:
 		return x * rhs.y - y * rhs.x;
 	}
 
+	inline double angle(const Vec2& rhs) const
+	{
+		double sqlen = squaredLength();
+		double sqlen2 = rhs.squaredLength();
+
+		if (sqlen == 0.0 || sqlen2 == 0.0) {
+			return 0.0;
+		}
+
+		double val = dot(rhs) / sqrt(sqlen) / sqrt(sqlen2);
+		val = std::max(-1.0, min(val, 1.0));
+		return acos(val);
+	}
 
 public:
 	static const Vec2& xAxis() { static Vec2 vec(1, 0); return vec; }
@@ -549,6 +564,10 @@ public:
 	friend istream& operator>> (istream& istr, Vec2& rhs) {
 		istr >> rhs.x >> rhs.y;
 		return istr;
+	}
+
+	friend bool operator< (const Vec2& lhs, const Vec2& rhs) {
+		return lhs.x != rhs.x ? lhs.x < rhs.x : lhs.y < rhs.y;
 	}
 
 public:
@@ -844,6 +863,68 @@ public:
 };
 endsnippet
 
+
+snippet algconvexhull "convex hull algorithm"
+vector<Vec2> convexHull(vector<Vec2> points) {
+	// https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain#C++
+	size_t n = points.size();
+	if (n <= 3) {
+		return points;
+	}
+
+	vector<Vec2> H(2*n);
+	size_t k = 0;
+
+	sort(points.begin(), points.end());
+	
+	for (size_t i = 0; i < n; ++i) {
+		while (k >= 2 && (H[k-1] - H[k-2]).cross(points[i] - H[k-2]) <= 0) k--;
+		H[k++] = points[i];
+	}
+	
+	// Build upper hull
+	for (size_t i = n-1, t = k+1; i > 0; --i) {
+		while (k >= t && (H[k-1] - H[k-2]).cross(points[i-1] - H[k-2]) <= 0) k--;
+		H[k++] = points[i-1];
+	}
+
+	H.resize(k-1);
+	return H;
+}
+endsnippet
+
+snippet algrotatingcalipers "rotating calipers"
+void rotatingCalipers(const vector<Vec2>& shell, int& i, int& j) {
+	// rotating calipers algorithm
+	i = 0;
+	j = 1;
+	const int m = shell.size();
+
+	LL furthest = shell[j].squaredLength(shell[i]);
+	int iBest=i, jBest=j;
+	
+	for (int k = 0; k < shell.size() || i != 0; ++k) {
+		const int i2 = (i + 1) % m;
+		const int j2 = (j + 1) % m;
+		int orientation =
+				Vec2::orientation(shell[i], shell[i2], shell[j2] - shell[j] + shell[i]);
+		if (orientation > 0) {
+			i = i2;
+		} else {
+			j = j2;
+		}
+		LL distance = shell[j].squaredLength(shell[i]);
+		if (distance > furthest) {
+			furthest = distance;
+			iBest = i;
+			jBest = j;
+		}
+	}
+	i = iBest;
+	j = jBest;
+}
+endsnippet
+
 snippet algshoelace "the shoelace algorithm, that calculates area of the 2d polygon"
 double shoelace(const vector<Point2>& points) {
 	double res = 0;
@@ -968,6 +1049,72 @@ class SegTree {
 };
 endsnippet
 
+snippet clsfenwicktree "binary indexed tree class, solution of boj_2042"
+template <typename T>
+class FenwickTree {
+ public:
+	vector<T> arr_;
+	vector<T> tree_;
+
+ public:
+	FenwickTree(size_t n) 
+		: arr_(n, defaultValue()) 
+		, tree_(n, defaultValue()) 
+	{}
+
+	FenwickTree(const vector<T>& arr) {
+		init(arr);
+	}
+
+ public:
+	void update(int i, const T& val) {
+		T diff = val - arr_[i];
+		arr_[i] = val;
+		while (i < tree_.size()) {
+			tree_[i] += diff;
+			i += LSB(i);
+		}
+	}
+
+	T query(int i) {
+		T res = defaultValue();
+		while (i > 0) {
+			res += tree_[i];
+			i -= LSB(i);
+		}
+		return res;
+	}
+
+	T query(int i, int j) {
+		T res = defaultValue();
+		for (i--; j > i; j -= LSB(j)) {
+			res += tree_[j];
+		}
+		for (; i > j; i -= LSB(i)) {
+			res -= tree_[i];
+		}
+		return res;
+	}
+
+	static inline T defaultValue() {
+		return 0;
+	}
+
+	static inline int LSB(int i) { return i & (-i); }
+
+ private:
+	void init(const vector<T>& arr) {
+		arr_ = arr;
+		tree_ = arr;
+		for (int i = 1; i < tree_.size(); ++i) {
+			int j = i + LSB(i);
+			if (j < tree_.size())
+				tree_[j] += tree_[i];
+		}
+	}
+};
+endsnippet
+
 snippet algkmp "KMP, string search algorithm. solution of boj_5525"
 vector<size_t> kmpPartialMatch(const string& query){
 		size_t m = query.size();
@@ -1054,6 +1201,7 @@ endsnippet
 
 snippet clssparsetable "Sparse table, datastructure. the solution of boj_17435"
 class SparseTable {
+ public:
 	vector<vector<int>> table_;
 	int maxDepth_;
 
@@ -1123,7 +1271,7 @@ class LCA {
 		for (auto d : depth) {
 			maxDepth = max(d, maxDepth);
 		}
-		logMaxDepth_ = log2(maxDepth) + 2;
+		logMaxDepth_ = log2(maxDepth) + 1;
 		parent_ = SparseTable(parent, logMaxDepth_);
 	}
 
@@ -1151,4 +1299,382 @@ class LCA {
 		return u;
 	}
 };
+endsnippet
+
+snippet clscountingsegtree "Counting Segment tree, solution of boj_7626"
+template<typename T>
+class CountingSegTree {
+ public:
+	vector<T> tree_;
+	size_t n_;
+
+	vector<int> count_;
+
+ public:
+	CountingSegTree(size_t size) {
+		n_ = size;
+		tree_.resize(4 * n_, 0);
+		count_.resize(4 * n_, 0);
+	}
+
+	T query(size_t left, size_t right) {
+		return query(left, right, 1, 0, n_ - 1);
+	}
+
+	void updateRange(size_t left, size_t right, int inc, 
+			const function<T(int, size_t, size_t)>& transform) {
+		updateRange(left, right, inc, 1, 0, n_ - 1, transform);
+	}
+
+ private:
+	T query(size_t left,
+					size_t right,
+					size_t node_idx,
+					size_t node_left,
+					size_t node_right) {
+		if (right < node_left || node_right < left) {
+			return 0;
+		}
+		if (left <= node_left && node_right <= right) {
+			return tree_[node_idx];
+		}
+		size_t mid = (node_left + node_right) / 2;
+		T res_left = query(left, right, node_idx * 2, node_left, mid);
+		T res_right = query(left, right, node_idx * 2 + 1, mid + 1, node_right);
+		return aggregate(res_left, res_right);
+	}
+
+	void updateRange(
+			size_t left, 
+			size_t right,
+			const int& inc,
+			size_t node_idx,
+			size_t node_left,
+			size_t node_right, 
+			const function<T(int, size_t, size_t)>& transform) {
+		if (right < node_left || node_right < left) {
+			return;
+		}
+		if (left <= node_left && node_right <= right) {
+			count_[node_idx] += inc;
+		}
+		else {
+			size_t mid = (node_left + node_right) / 2;
+			updateRange(left, right, inc, node_idx * 2, node_left, mid, transform);
+			updateRange(left, right, inc, node_idx * 2 + 1, mid+1, node_right, transform);
+		}
+
+		if (count_[node_idx]) {
+			tree_[node_idx] = transform(0, node_left, node_right);
+		}
+		else if (node_left == node_right) {
+			tree_[node_idx] = 0;
+		}
+		else {
+			tree_[node_idx] = aggregate(tree_[node_idx * 2], tree_[node_idx * 2 + 1]);
+		}
+	}
+
+	static T aggregate(const T& lhs, const T& rhs) { return lhs + rhs; }
+};
+endsnippet
+
+snippet algmergesort "merge sort algorithm. solution of boj_1517"
+template <typename T>
+LL merge_(typename vector<T>::iterator lLeft,
+					 typename vector<T>::iterator lRight,
+					 typename vector<T>::iterator rLeft,
+					 typename vector<T>::iterator rRight) {
+	vector<T> tmp;
+	tmp.reserve(rRight - lLeft);
+	auto begin = lLeft;
+
+	LL countInv = 0;
+	while (lLeft != lRight || rLeft != rRight) {
+		if (lLeft == lRight) {
+			tmp.push_back(*rLeft);
+			rLeft++;
+		} else if (rLeft == rRight || *lLeft <= *rLeft) {
+			tmp.push_back(*lLeft);
+			lLeft++;
+		} else {
+			countInv += lRight - lLeft;
+			tmp.push_back(*rLeft);
+			rLeft++;
+		}
+	}
+	copy(tmp.begin(), tmp.end(), begin);
+	return countInv;
+}
+
+template <typename T>
+LL mergeSort(typename vector<T>::iterator left, typename vector<T>::iterator right) {
+	if (left + 1 == right) {
+		return 0;
+	}
+	LL countInv = 0;
+	auto mid = left + (right - left) / 2;
+	countInv += mergeSort<T>(left, mid);
+	countInv += mergeSort<T>(mid, right);
+	countInv += merge_<T>(left, mid, mid, right);
+	return countInv;
+}
+endsnippet
+
+snippet algtarjanscc "tarjan's algorithm, find strongly connected components. solution of boj_2150"
+vector<vector<int>> tarjanSCC(const vector<vector<int>>& edges) {
+	struct Vertex {
+		int vid;
+		int index = -1;
+		bool processed = false;
+	};
+	vector<vector<int>> res;
+	stack<Vertex*> S;
+	vector<Vertex> vertices(edges.size());
+	for (int i = 0; i < edges.size(); ++i) {
+		vertices[i].vid = i;
+	}
+	int index = 0;
+
+	function<int(Vertex&)> dfs = [&](Vertex& v) -> int {
+		v.index = index++;
+		S.push(&v);
+		int parent = v.index;
+		for (int nxt : edges[v.vid]) {
+			Vertex& w = vertices[nxt];
+			if (w.index == -1) {
+				parent = min(parent, dfs(w));
+			} else if (!w.processed) {
+				parent = min(parent, w.index);
+			}
+		}
+		if (parent == v.index) {
+			vector<int> newSCC;
+			Vertex* w;
+			do {
+				w = S.top();
+				S.pop();
+				w->processed = true;
+				newSCC.push_back(w->vid);
+			} while (w->vid != v.vid);
+			res.push_back(newSCC);
+		}
+		return parent;
+	};
+
+	for (auto& v : vertices) {
+		if (v.index == -1) {
+			dfs(v);
+		}
+	}
+
+	return res;
+}
+endsnippet
+
+snippet alg2sat "2sat solver. solution of boj_11281"
+vector<bool> twoSAT(const vector<vector<int>>& graph,
+										const function<int(int)>& neg) {
+	auto sccs = tarjanSCC(graph);
+	size_t N = graph.size() / 2;
+
+	vector<int> sccGroup(graph.size());
+	for (int i = 0; i < sccs.size(); ++i) {
+		const auto& scc = sccs[i];
+		for (int j : scc) {
+			sccGroup[j] = i;
+		}
+	}
+
+	for (int i = 0; i < N; ++i) {
+		if (sccGroup[i] == sccGroup[neg(i)]) {
+			return {};
+		}
+	}
+
+	vector<bool> res(N);
+	for (int i = 0; i < res.size(); ++i) {
+		res[i] = sccGroup[i] < sccGroup[neg(i)];
+	}
+	return res;
+}
+endsnippet
+
+snippet algbipartite "bipartite matching algorithm. solution of boj_11375"
+class BipartiteMatching {
+ public:
+	const vector<vector<int>>& edges_;
+	size_t nDst_;
+	vector<int> matches_;
+	vector<bool> visited_;
+
+ public:
+	BipartiteMatching(const vector<vector<int>>& edges, int nDst = -1)
+			: edges_(edges), nDst_(nDst) {
+		if (nDst_ == -1) {
+			for (int i = 0; i < edges.size(); ++i) {
+				for (int w : edges[i]) {
+					nDst_ = max(nDst_, (size_t)(w+1));
+				}
+			}
+		}
+		matches_.resize(nDst, -1);
+		visited_.resize(nDst, false);
+	}
+
+	size_t solve() {
+		size_t res = 0;
+		for (size_t i = 0; i < edges_.size(); ++i) {
+			fill(all(visited_), false);
+			res += dfs(i);
+		}
+		return res;
+	}
+
+	std::vector<std::pair<int, int>> matches() const {
+		std::vector<std::pair<int, int>> res;
+		for (size_t dst = 0; dst < matches_.size(); ++dst) {
+			const auto& src = matches_[dst];
+			if (src != -1) {
+				res.push_back({src, dst});
+			}
+		}
+		return res;
+	}
+
+ private:
+	bool dfs(int src) {
+		for (int dst : edges_[src]) {
+			if (visited_[dst]) {
+				continue;
+			}
+			visited_[dst] = true;
+			if (matches_[dst] == -1 || dfs(matches_[dst])) {
+				matches_[dst] = src;
+				return true;
+			}
+		}
+		return false;
+	}
+};
+endsnippet
+
+
+snippet clsmatrix "2d matrix class"
+template<unsigned R, unsigned C, typename T=LL>
+class Matrix {
+ public:
+	T arr[R*C] = {0};
+	
+ public:
+	Matrix() {}
+
+	Matrix(const Matrix& other) {
+		copy(other.arr, other.arr + (R*C), arr);
+		if constexpr (MOD > 1) {
+			for (size_t i = 0; i < R * C; ++i) {
+				arr[i] %= MOD;
+			}
+		}
+	}
+	
+	Matrix(const vector<T>&& rhs) {
+		copy(rhs.begin(), rhs.end(), arr);
+		if constexpr (MOD > 1) {
+			for (size_t i = 0; i < R * C; ++i) {
+				arr[i] %= MOD;
+			}
+		}
+	}
+
+ public:
+	T& at(int r, int c) {
+		r = r < 0 ? R + r : r;
+		c = c < 0 ? C - c : c;
+		return arr[C * r + c];
+	}
+
+	const T& constAt(int r, int c) const {
+		r = r < 0 ? R + r : r;
+		c = c < 0 ? C - c : c;
+		return arr[C * r + c];
+	}
+
+	Matrix operator*=(const Matrix& rhs) {
+		Matrix tmp = *this * rhs;
+		copy(tmp.arr, tmp.arr + (R*C), arr);
+		return *this;
+	}
+
+ public:
+	friend std::ostream& operator<< (std::ostream& ostr, const Matrix& rhs) {
+		for (size_t r = 0; r < R; ++r) {
+			for (size_t c = 0; c < C; ++c) {
+				ostr << rhs.constAt(r, c) << ((c == C-1) ? "\n" : " ");
+			}
+		}
+		return ostr;
+	}
+
+	static constexpr Matrix eye() {
+		static_assert(R == C);
+		Matrix res;
+		for (size_t i = 0; i < R; ++i) {
+			res.at(i, i) = 1;
+		}
+		return res;
+	}
+
+	static constexpr Matrix zeros() {
+		Matrix res;
+		return res;
+	}
+};
+
+template <unsigned R1,
+					unsigned C1,
+					typename T1,
+					unsigned R2,
+					unsigned C2,
+					typename T2>
+static Matrix<R1, C2, T1> operator*(const Matrix<R1, C1, T1>& lhs,
+																		const Matrix<R2, C2, T2>& rhs) {
+	static_assert(C1 == R2);
+	static_assert(std::is_same<T1, T2>());
+	Matrix<R1, C2, T1> res;
+	for (size_t r = 0; r < R1; ++r) {
+		for (size_t c = 0; c < C2; ++c) {
+			for (size_t i = 0; i < C1; ++i) {
+				res.at(r, c) += lhs.constAt(r, i) * rhs.constAt(i, c);
+				if constexpr (MOD > 1) {
+					if (res.at(r, c) < 0) res.at(r, c) += MOD;
+					res.at(r, c) %= MOD;
+				}
+			}
+		}
+	}
+	return res;
+}
+endsnippet
+
+snippet algmatpow "power of matrix"
+template <unsigned N, typename T>
+Matrix<N, N, T> pow(const Matrix<N, N, T>& base, LL exp) {
+	if (exp == -1) {
+		return Matrix<N, N, T>::zeros();
+	}
+	if (exp == 0) {
+		return Matrix<N, N, T>::eye();
+	}
+	if (exp == 1) {
+		return base;
+	}
+	
+	auto res = pow(base, exp / 2);
+	res = res * res;
+	if (exp & 1) {
+		res *= base;
+	}
+	return res;
+}
 endsnippet
