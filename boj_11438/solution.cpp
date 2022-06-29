@@ -67,7 +67,7 @@ class LCA {
     for (auto d : depth) {
       maxDepth = max(d, maxDepth);
     }
-    logMaxDepth_ = log2(maxDepth) + 2;
+    logMaxDepth_ = log2(maxDepth) + 1;
     parent_ = SparseTable(parent, logMaxDepth_);
   }
 

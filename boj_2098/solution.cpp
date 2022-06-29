@@ -18,26 +18,33 @@ struct Solution {
     memo.resize(N, vector<int>(1 << N, INF));
   }
 
-  int dfs(int last, int mask) {
-    if (mask == end) {
-      // NOTE there may be invalid edge!
-      if (W[last][0] == 0) {
-        return INF;
+  int solve() {
+    set<pair<int, int>> Q;
+    memo[0][1] = 0;
+    Q.insert({0, 1});
+    while (!Q.empty()) {
+      set<pair<int, int>> Qnxt;
+      for (auto [prv, mask] : Q) {
+        for (int i = 0; i < N; ++i) {
+          if ((mask >> i) & 1 || W[prv][i] == 0) {
+            continue;
+          }
+          int nxt_mask = mask | (1 << i);
+          memo[i][nxt_mask] = min(memo[i][nxt_mask], memo[prv][mask] + W[prv][i]);
+          Qnxt.insert({i, nxt_mask});
+        }
       }
-      return W[last][0];
+      Q.swap(Qnxt);
     }
-    int& res = memo[last][mask];
-    if (res != INF) {
-      return res;
-    }
-    for (int j = 0; j < N; ++j) {
-      if ((mask >> j) & 1 || W[last][j] == 0) {
-        continue;
+    int ans = INF;
+    for (int i = 1; i < N; ++i) {
+      if (W[i][0] > 0) {
+        ans = min(ans, memo[i][end]+W[i][0]);
       }
-      res = min(res, dfs(j, mask | (1 << j)) + W[last][j]);
     }
-    return res;
+    return ans;
   }
+    
 
   int N;
   vector<vector<int>> W;
@@ -47,7 +54,7 @@ struct Solution {
 
 int main() {
   Solution s;
-  int ans = s.dfs(0, 1);
+  int ans = s.solve();
   printf("%d\n", ans);
 
   return 0;

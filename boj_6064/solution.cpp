@@ -1,40 +1,37 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+using LL = long long;
+
 int main() {
   int T;
   scanf("%d", &T);
 
   while (T--) {
-    int M, N, x, y;
-    scanf("%d %d %d %d", &M, &N, &x, &y);
+    LL M, N, x, y;
+    scanf("%lld %lld %lld %lld", &M, &N, &x, &y);
     x--;
     y--;
-
-    unordered_set<int> A;
-    unordered_set<int> B;
-
-    int max_year = M * N;
-    for (int i = 0; i + x < max_year; i += M) {
-      A.insert(i+x);
-    }
-    for (int i = 0; i + y < max_year; i += N) {
-      B.insert(i+y);
+    if (M < N) {
+      swap(M, N);
+      swap(x, y);
     }
 
-    unordered_set<int> C;
-    for (int a : A) {
-      if (B.find(a) != B.end()) {
-        C.insert(a);
+    bool good = false;
+    LL cand = x;
+    while (cand < M * N) {
+      if (cand % N == y) {
+        good = true;
+        break;
       }
+      cand += M;
     }
-    if (C.empty()) {
-      printf("-1\n");
+    if (good) {
+      printf("%lld\n", cand+1);
     }
     else {
-      printf("%d\n", *C.begin() + 1);
+      printf("-1\n");
     }
   }
-
   return 0;
 }

@@ -79,28 +79,107 @@ class SegTree {
   }
 };
 
+template <typename T>
+class FenwickTree {
+ public:
+  vector<T> arr_;
+  vector<T> tree_;
+
+ public:
+  FenwickTree(size_t n) 
+    : arr_(n, defaultValue()) 
+    , tree_(n, defaultValue()) 
+  {}
+
+  FenwickTree(const vector<T>& arr) {
+    init(arr);
+  }
+
+ public:
+  void update(int i, const T& val) {
+    T diff = val - arr_[i];
+    arr_[i] = val;
+    while (i < tree_.size()) {
+      tree_[i] += diff;
+      i += LSB(i);
+    }
+  }
+
+  T query(int i) {
+    T res = defaultValue();
+    while (i > 0) {
+      res += tree_[i];
+      i -= LSB(i);
+    }
+    return res;
+  }
+
+  T query(int i, int j) {
+    T res = defaultValue();
+    for (i--; j > i; j -= LSB(j)) {
+      res += tree_[j];
+    }
+    for (; i > j; i -= LSB(i)) {
+      res -= tree_[i];
+    }
+    return res;
+  }
+
+  static inline T defaultValue() {
+    return 0;
+  }
+
+  static inline int LSB(int i) { return i & (-i); }
+
+ private:
+  void init(const vector<T>& arr) {
+    arr_ = arr;
+    tree_ = arr;
+    for (int i = 1; i < tree_.size(); ++i) {
+      int j = i + LSB(i);
+      if (j < tree_.size())
+        tree_[j] += tree_[i];
+    }
+  }
+};
+
 int main() {
   int N, M, K;
   scanf("%d %d %d", &N, &M, &K);
   
-  vector<LL> arr(N);
-  for (int i = 0; i < N; ++i) {
+  //vector<LL> arr(N);
+  //for (int i = 0; i < N; ++i) {
+    //scanf("%lld", &arr[i]);
+  //}
+  //SegTree<LL> tree(arr);
+  //for (int i = 0; i < M+K; ++i) {
+    //LL a, b, c;
+    //scanf("%lld %lld %lld", &a, &b, &c);
+    //if (a == 1) { // update
+      //tree.update(b-1, c);
+    //}
+    //if (a == 2) { // query
+      //cout << tree.query(b-1, c-1) << "\n";
+    //}
+  //}
+  
+
+  vector<LL> arr(N+1);
+  for (int i = 1; i <= N; ++i) {
     scanf("%lld", &arr[i]);
   }
+  FenwickTree<LL> tree(arr);
 
-  SegTree<LL> tree(arr);
-
-  for (int i = 0; i < M+K; ++i) {
+  for (int i = 0; i < M + K; ++i) {
     LL a, b, c;
     scanf("%lld %lld %lld", &a, &b, &c);
-    if (a == 1) { // update
-      tree.update(b-1, c);
+    if (a == 1) {  // update
+      tree.update(b, c);
     }
-    if (a == 2) { // query
-      cout << tree.query(b-1, c-1) << "\n";
+    if (a == 2) {  // query
+      LL ans = tree.query(b, c);
+      printf("%lld\n", ans);
     }
-    
   }
-
   return 0;
 }
