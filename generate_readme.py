@@ -25,18 +25,33 @@ def problems():
 
 
 def problems_with_desciptions(result):
-    res = []
+    def parse_tags(lines):
+        for line in lines:
+            m = re.search(r'\-\-tags: (.*)-->', line)
+            if m:
+                return m.group(1)
+        return ""
+
+    def to_table(rows):
+        res = []
+        res.append('| name | tags |')
+        res.append('| ---- | ---- |')
+        for name, tag in rows:
+            res.append(f'| {name} | {tag} |')
+        return '\n'.join(res)
+
+    rows = []
     for p in problems():
         readme_filepath = os.path.join(p, 'readme.md')
         if not os.path.isfile(readme_filepath):
             continue
         with open(readme_filepath, 'r') as f:
             readme_lines = f.readlines()
-        if len(readme_lines) < 10:
+        if len(readme_lines) <= 2:
             continue
         name = os.path.basename(p)
-        res.append(f'[{name}]({name})')
-    result.append(', '.join(res))
+        rows.append((f'[{name}]({name})', parse_tags(readme_lines)))
+    result.append(to_table(rows))
     
 
 def main():
@@ -52,6 +67,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
 
