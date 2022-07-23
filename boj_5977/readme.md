@@ -1,4 +1,4 @@
-# BOJ 5977
+# [BOJ 5977](https://www.acmicpc.net/problem/5977)
 
 점화식은
 
@@ -10,7 +10,7 @@ where
 
 $$
 \begin{align}
-  X_i &= [1, i] \text{구간에서의 최대합} \\
+  X_i &= [1, i] \text{ 구간에서의 최대합} \\
   S_i &= \sum_{j=1}^{i}{e_j}
 \end{align}
 $$

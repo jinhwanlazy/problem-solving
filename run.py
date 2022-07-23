@@ -73,7 +73,7 @@ class CppSolution(Solution):
         start_time = datetime.now()
         cmd = ['g++-11', 
             '-O2',
-            '-std=c++20',
+            '-std=c++17',
             '-Wall', 
             '-Weffc++',
             '-fdiagnostics-color=always', 
@@ -127,7 +127,7 @@ class TestSample(metaclass=abc.ABCMeta):
     def is_equal(self, a, b):
         if self.output_type == 'str':
             return a == b
-        if self.output_type == 'float':
+        elif self.output_type == 'float':
             return abs(float(a) - float(b)) < self.precision
         else:
             raise NotImplementedError
@@ -251,7 +251,7 @@ def run_test(problem, language, *args, **kwargs):
         if (not res or kwargs.get('verbose', False)) and report:
             print(report)
 
-    solution.clean()
+    # solution.clean()
 
 
 def main():
