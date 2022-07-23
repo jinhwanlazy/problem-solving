@@ -1,5 +1,5 @@
 # [BOJ 5977 Mowing the Lawn](https://www.acmicpc.net/problem/5977)
-<!--tags: data structures, deque, dynamic programming, dynamic programming using a deque-->
+<!--tags: deque, deque dp, dp, ds-->
 
 점화식은
 
