@@ -2,4 +2,4 @@
 
 | name | tags |
 | ---- | ---- |
-| [boj_5977](boj_5977) | data structures, deque, dynamic programming, dynamic programming using a deque |
+| [BOJ 5977 Mowing the Lawn](boj_5977) | data structures, deque, dynamic programming, dynamic programming using a deque |

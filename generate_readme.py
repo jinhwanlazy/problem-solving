@@ -25,6 +25,9 @@ def problems():
 
 
 def problems_with_desciptions(result):
+    def parse_name(lines):
+        return re.search(r'\[(.+)\]', lines[0][2:]).group(1)
+
     def parse_tags(lines):
         for line in lines:
             m = re.search(r'\-\-tags: (.*)-->', line)
@@ -49,8 +52,10 @@ def problems_with_desciptions(result):
             readme_lines = f.readlines()
         if len(readme_lines) <= 2:
             continue
-        name = os.path.basename(p)
-        rows.append((f'[{name}]({name})', parse_tags(readme_lines)))
+        name = parse_name(readme_lines)
+        tags = parse_tags(readme_lines)
+        loc = os.path.basename(p)
+        rows.append((f'[{name}]({loc})',tags))
     result.append(to_table(rows))
     
 
