@@ -24,7 +24,7 @@ def problems():
     return [os.path.join(PROJECT_DIRPATH, d) for d in dirnames]
 
 
-def problems_with_desciptions(result):
+def problems_with_desciptions():
     def parse_name(lines):
         return re.search(r'\[(.+)\]', lines[0][2:]).group(1)
 
@@ -56,19 +56,19 @@ def problems_with_desciptions(result):
         tags = parse_tags(readme_lines)
         loc = os.path.basename(p)
         rows.append((f'[{name}]({loc})',tags))
-    result.append(to_table(rows))
+    return to_table(rows)
     
 
 def main():
-    result = []
-    result.append(
-''' # 설명이 있는 문제들
-''')
-    
-    problems_with_desciptions(result)
+    template_filepath = os.path.join(PROJECT_DIRPATH, '.misc', 'readme_template.md')
+    with open(template_filepath, 'r') as f:
+        template = f.read()
+    print(template)
+
+    template = template.replace('SOLUTIONS_WITH_DESCRIPTION', problems_with_desciptions())
 
     with open(os.path.join(PROJECT_DIRPATH, 'readme.md'), 'w') as f:
-        f.write('\n'.join(result))
+        f.write(template)
 
 if __name__ == '__main__':
     main()
