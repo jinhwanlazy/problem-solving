@@ -105,8 +105,6 @@ class BojProblem(Problem):
             for tagNames in tag.get('displayNames', []):
                 if tagNames.get('language') == 'en' and tagNames.get('short'):
                     res.append(tagNames['short'])
-        from pprint import pprint
-        pprint(self.info_)
         return sorted(res)
 
     def get_info_(self):
@@ -141,7 +139,7 @@ def init_problem(pid, src, verbose=False):
 
     # generate readme.md
     readme = f'''# [{src.upper()} {pid} {problem.alt_name() if problem.alt_name() else problem.name()}]({problem.url()})
-tags: {', '.join(problem.tags())}
+<!--tags: {', '.join(problem.tags())}-->
 '''
     readme_filepath = os.path.join(problem.dirpath(), 'readme.md')
     if not os.path.isfile(readme_filepath) or len(open(readme_filepath).readlines()) <= 2:
