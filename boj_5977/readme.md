@@ -8,12 +8,12 @@ $$
 
 where 
 
-```math
+$$
 \begin{align}
   X_i &= [1, i] \text{구간에서의 최대합} \\
   S_i &= \sum_{j=1}^{i}{e_j}
 \end{align}
-```
+$$
 
 이걸 naive하게 계산하려고 하면 $O(N^2)$.
 
