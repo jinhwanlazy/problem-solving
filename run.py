@@ -20,7 +20,14 @@ parser.add_argument('--precision', type=float, default=1e-6)
 parser.add_argument('--verbose', '-v', action='store_true')
 parser.add_argument('--use_python2', action='store_true')
 
+def make_red(s):
+    return '\033[93m' + s + '\033[0m'
 
+
+def make_green(s):
+    return '\033[92m' + s + '\033[0m'
+
+    
 class Solution(metaclass=abc.ABCMeta):
     def __init__(self, filepath, *args, **kwargs):
         super().__init__()
@@ -138,6 +145,7 @@ class TxtSample(TestSample):
         super().__init__(self, *args, **kwargs)
         self.input_txt = input_txt
         self.output_txt = output_txt
+        self.verbose = kwargs.get('verbose', False)
 
     def __repr__(self):
         return os.path.basename(self.input_txt)
@@ -158,18 +166,17 @@ class TxtSample(TestSample):
 
         ref_lines = self.ref_output()
 
-        res = True
+        correct = True
         report = []
         for i, (a, b) in enumerate(zip(ans_lines, ref_lines)):
-            correct = self.is_equal(a, b)
-            res &= correct
-            if not correct:
-                report.append(f'case {i} - failed'
-                f'\n\tcorrent ans: {b.decode()}'
-                f'\n\tyour ans: {a.decode()}')
-            else:
-                report.append(f'case {i} - ok')
-        return res, '\n'.join(report)
+            correct &= self.is_equal(a, b)
+        if self.verbose or not correct:
+            report.append("Your answer: ")
+            report.append(b'\n'.join(ans_lines).decode())
+            report.append("Correct answer: ")
+            report.append(b'\n'.join(ref_lines).decode())
+        # report.append('CORRECT!' if correct else 'Wrong Answer')
+        return correct, '\n'.join(report)
 
 
 class TxtSampleWithoutOutput(TxtSample):
@@ -181,11 +188,9 @@ class TxtSampleWithoutOutput(TxtSample):
         pass
     
     def validate(self, ans):
-        ans_lines = ans.split(b'\n')
-        ans_lines = [l.strip() for l in ans_lines if l]
         report = []
-        for i, ans in enumerate(ans_lines):
-            report.append(f'case {i} - {ans.decode()}')
+        report.append("Your answer: ")
+        report.append(ans.decode())
         return True, '\n'.join(report)
 
 
@@ -245,13 +250,11 @@ def run_test(problem, language, *args, **kwargs):
         elapsed = datetime.now() - start_time
         res, report = sample.validate(ans)
         if res:
-            print(f'{sample} passed - elapsed: {elapsed}')
+            print(make_green(f'{sample} passed! - elapsed: {elapsed}'))
         else:
-            print(f'{sample} failed - elapsed: {elapsed}')
+            print(make_red(f'{sample} failed! - elapsed: {elapsed}'))
         if (not res or kwargs.get('verbose', False)) and report:
             print(report)
-
-    # solution.clean()
 
 
 def main():
