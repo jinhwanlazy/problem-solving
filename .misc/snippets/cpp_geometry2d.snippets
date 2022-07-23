@@ -219,14 +219,13 @@ public:
 endsnippet
 
 snippet clsseg2 "2D Segment class"
-class Seg2
-{
-public:
+class Seg2 {
+ public:
 	Vec2 start;
 	Vec2 end;
 
-public:
-	Vec2 center() const { return (start + end) / 2;}
+ public:
+	Vec2 center() const { return (start + end) / 2; }
 
 	Vec2 direction() const { return end - start; }
 
@@ -234,16 +233,13 @@ public:
 
 	double length() const { return (end - start).length(); }
 
-public:
+ public:
 	bool contains(const Vec2& point) const {
 		static constexpr double epsilon = 1e-10;
-		return Vec2::onSegment(start, point, end) && 
-			(start - point).cross(point - end) < epsilon;
+		return Vec2::onSegment(start, point, end) && (start - point).cross(point - end) < epsilon;
 	}
 
-	bool contains(const Seg2& rhs) const {
-		return contains(rhs.start) && contains(rhs.end);
-	}
+	bool contains(const Seg2& rhs) const { return contains(rhs.start) && contains(rhs.end); }
 
 	bool intersects(const Seg2& rhs) const {
 		const auto& p1 = this->start;
@@ -251,18 +247,22 @@ public:
 		const auto& p2 = rhs.start;
 		const auto& q2 = rhs.end;
 
-		int o1 = Vec2::orientation(p1, q1, p2); 
-		int o2 = Vec2::orientation(p1, q1, q2); 
-		int o3 = Vec2::orientation(p2, q2, p1); 
-		int o4 = Vec2::orientation(p2, q2, q1); 
+		int o1 = Vec2::orientation(p1, q1, p2);
+		int o2 = Vec2::orientation(p1, q1, q2);
+		int o3 = Vec2::orientation(p2, q2, p1);
+		int o4 = Vec2::orientation(p2, q2, q1);
 
-		if (o1 * o2 < 0 && o3 * o4 < 0) 
-			return true; 
+		if (o1 * o2 < 0 && o3 * o4 < 0)
+			return true;
 
-		if (o1 == 0 && Vec2::onSegment(p1, p2, q1)) return true; 
-		if (o2 == 0 && Vec2::onSegment(p1, q2, q1)) return true; 
-		if (o3 == 0 && Vec2::onSegment(p2, p1, q2)) return true; 
-		if (o4 == 0 && Vec2::onSegment(p2, q1, q2)) return true; 
+		if (o1 == 0 && Vec2::onSegment(p1, p2, q1))
+			return true;
+		if (o2 == 0 && Vec2::onSegment(p1, q2, q1))
+			return true;
+		if (o3 == 0 && Vec2::onSegment(p2, p1, q2))
+			return true;
+		if (o4 == 0 && Vec2::onSegment(p2, q1, q2))
+			return true;
 		return false;
 	}
 
@@ -277,7 +277,29 @@ public:
 		auto b = (q - p).cross(r);
 		return a == 0 && b == 0;
 	}
-	
+
+	Seg2 overlap(const Seg2& rhs) const {
+		if (!colinear(rhs)) {
+			throw runtime_error("two vector should be colinear");
+		}
+		if (isOn(rhs.start) && isOn(rhs.end)) {
+			return rhs;
+		}
+		if (rhs.isOn(start) && rhs.isOn(end)) {
+			return *this;
+		}
+		Vec2 s = isOn(rhs.start) ? rhs.start : rhs.end;
+		Vec2 e = rhs.isOn(start) ? start : end;
+		return {s, e};
+	}
+
+	bool isOn(const Vec2& p) const {
+		return p.x <= max(start.x, end.x)		 //
+					 && p.x >= min(start.x, end.x)	//
+					 && p.y <= max(start.y, end.y)	//
+					 && p.y >= min(start.y, end.y);
+	}
+
 	Vec2 intersection(const Seg2& rhs) const {
 		// https://stackoverflow.com/a/565282
 		const auto& p = this->start;
@@ -291,8 +313,7 @@ public:
 			// case1: colinear
 			if (this->contains(rhs.start)) {
 				return rhs.start;
-			}
-			else {
+			} else {
 				return rhs.end;
 			}
 		} else if (a == 0 && b != 0) {
@@ -304,38 +325,34 @@ public:
 		if (0 <= t && t <= 1.0 && 0 <= u && u <= 1.0) {
 			// case3: intersects
 			return p + r * t;
-		}
-		else {
+		} else {
 			// case 4: not parallel but do not intersects
 			throw runtime_error("case 4. should be checked using intersects() before");
 		}
 	}
 
-public:
-	friend ostream& operator<< (ostream& ostr, const Seg2& rhs) {
+ public:
+	friend ostream& operator<<(ostream& ostr, const Seg2& rhs) {
 		ostr << "Seg2(" << rhs.start << ", " << rhs.end << ")";
 		return ostr;
 	}
 
-	friend istream& operator>> (istream& istr, Seg2& rhs) {
+	friend istream& operator>>(istream& istr, Seg2& rhs) {
 		istr >> rhs.start >> rhs.end;
 		return istr;
 	}
-	
 
-public:
-	Seg2() {};
+ public:
+	Seg2(){};
 
-	Seg2(const Vec2& start, const Vec2& end) 
-		: start(start), end(end) {};
+	Seg2(const Vec2& start, const Vec2& end) : start(start), end(end){};
 
-	Seg2(Vec2::T startX, Vec2::T startY, Vec2::T endX, Vec2::T endY) 
-		: start{startX, startY}, end{endX, endY} {};
+	Seg2(Vec2::T startX, Vec2::T startY, Vec2::T endX, Vec2::T endY)
+			: start{startX, startY}, end{endX, endY} {};
 
-	Seg2(const Seg2& rhs) 
-		: start(rhs.start), end(rhs.end) {};
+	Seg2(const Seg2& rhs) : start(rhs.start), end(rhs.end){};
 
-public:
+ public:
 	~Seg2() {}
 };
 endsnippet

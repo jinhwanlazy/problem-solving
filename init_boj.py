@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
         'pids', metavar='N', type=int, nargs='+', help='problem id')
 parser.add_argument('--force', action='store_true')
+parser.add_argument('--verbose', '-v', action='store_true')
 
 url_base = 'https://www.acmicpc.net/problem/{pid}'
 
@@ -29,6 +30,7 @@ def get_page(pid, url, force=False):
             f.write(html)
     return html
 
+
 def parse_examples(html):
     soup = BeautifulSoup(html, "html.parser") 
     for i in range(1, 100):
@@ -42,9 +44,12 @@ def parse_examples(html):
             out_tag = out_tag.text
         yield in_tag, out_tag
 
-def download(pid, url, force=False):
+
+def download(pid, url, force=False, verbose=False):
     print(f'downloading {url}...')
     page = get_page(pid, url, force)
+    if verbose:
+        print(page)
     examples = parse_examples(page)
     dirpath = f'boj_{pid}'
     os.makedirs(dirpath, exist_ok=True)
@@ -63,7 +68,7 @@ def download(pid, url, force=False):
 def main(pids=[], *args, **kwargs):
     for i, pid in enumerate(pids):
         url = url_base.format(pid=pid)
-        download(pid, url, force=kwargs.get('force'))
+        download(pid, url, force=kwargs.get('force'), verbose=kwargs.get('verbose'))
         if i < len(pids) - 1:
             time.sleep(5)
     
