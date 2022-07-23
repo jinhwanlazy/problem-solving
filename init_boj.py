@@ -103,8 +103,8 @@ class BojProblem(Problem):
         res = []
         for tag in self.info_.get('tags', []):
             for tagNames in tag.get('displayNames', []):
-                if tagNames.get('language') == 'en' and tagNames.get('short'):
-                    res.append(tagNames['short'])
+                if tagNames.get('language') == 'en' and tagNames.get('name'):
+                    res.append(tagNames['name'])
         return sorted(res)
 
     def get_info_(self):

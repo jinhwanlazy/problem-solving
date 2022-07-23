@@ -2,4 +2,4 @@
 
 | name | tags |
 | ---- | ---- |
-| [boj_5977](boj_5977) | deque, deque dp, dp, ds |
+| [boj_5977](boj_5977) | data structures, deque, dynamic programming, dynamic programming using a deque |
