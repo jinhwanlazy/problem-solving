@@ -100,7 +100,7 @@ def parse_snippet_file(filepath):
         if info is None:
             if line.startswith('snippet '):
                 m = re.match(r'^snippet\s(.*)\s"(.*)"$', line)
-                info = SnippetInfo(m.group(1), m.group(2), relpath, i, -1, None, [])
+                info = SnippetInfo(m.group(1), m.group(2), relpath, i+1, -1, None, [])
             else:
                 continue
         elif line.startswith('endsnippet'):
@@ -111,7 +111,7 @@ def parse_snippet_file(filepath):
         else:
             if info.first_line is None:
                 info.first_line = line.strip()
-            info.end = i
+            info.end = i+1
     return res
 
 def find_snippet_usage(info):
@@ -134,7 +134,7 @@ def generate_list_of_snippets_md():
         res.append('| ------- | ----------- | ------- |')
         for s in snippets:
             used_in = ' '.join((f'[{name}]({name})' for name in s.used_in))
-            res.append(f'| [{s.keyword}]({s.filepath}#L{s.start}-L{s.end}) | {s.description} | {used_in} |')
+            res.append(f'| [{s.keyword}]({s.filepath}#L{s.start}) | {s.description} | {used_in} |')
         return '\n'.join(res)
         
 
