@@ -1,14 +1,22 @@
 import os
 import re
-
-ALGORITHMS = [
-]
+from glob import glob
+from dataclasses import dataclass
+from typing import List
 
 PREFIX = [
-    'boj', 'swea', 'leet',
+    'boj', 'swea', 'leet', 'cf',
 ]
 
+ALGORITHMS = {
+    'algdijkstra', 'algunionfind', 'algtoposort', 'algtarjanscc',
+    'algbipartite', 'algkmp',
+
+    'algconvexhull', 'algrotatingcalipers', 'algshoelace',
+}
+
 PROJECT_DIRPATH = os.path.dirname(os.path.abspath(__file__))
+
 
 def problems():
     dirnames = []
@@ -24,7 +32,7 @@ def problems():
     return [os.path.join(PROJECT_DIRPATH, d) for d in dirnames]
 
 
-def problems_with_desciptions():
+def generate_problems_with_desciptions_md():
     def parse_name(lines):
         return re.search(r'\[(.+)\]', lines[0][2:]).group(1)
 
@@ -37,7 +45,7 @@ def problems_with_desciptions():
 
     def to_table(rows):
         res = []
-        res.append('| name | tags |')
+        res.append('| Name | Tags |')
         res.append('| ---- | ---- |')
         for name, tag in rows:
             res.append(f'| {name} | {tag} |')
@@ -57,6 +65,95 @@ def problems_with_desciptions():
         loc = os.path.basename(p)
         rows.append((f'[{name}]({loc})',tags))
     return to_table(rows)
+
+
+@dataclass
+class SnippetInfo:
+    keyword: str
+    description: str
+    filepath: str
+    start: int
+    end: int
+    first_line: str
+    used_in: List[str]
+
+
+def parse_snippets():
+    snippets_dirpath = os.path.join(PROJECT_DIRPATH, '.misc', 'snippets')
+    snippets_filepaths = glob(os.path.join(snippets_dirpath, 'cpp_*.snippets'))
+    res = []
+    for snippet_filepath in snippets_filepaths:
+        res.extend(parse_snippet_file(snippet_filepath))
+    return res
+
+
+def parse_snippet_file(filepath):
+    with open(filepath, 'r') as f:
+        lines = f.readlines()
+
+    relpath = filepath.replace(PROJECT_DIRPATH, "")
+    relpath = relpath if not relpath.startswith('/') else relpath[1:]
+
+    res = []
+    info = None
+    for i, line in enumerate(lines):
+        if info is None:
+            if line.startswith('snippet '):
+                m = re.match(r'^snippet\s(.*)\s"(.*)"$', line)
+                info = SnippetInfo(m.group(1), m.group(2), relpath, i, -1, None, [])
+            else:
+                continue
+        elif line.startswith('endsnippet'):
+            if info.keyword in ALGORITHMS:
+                info.used_in.extend(find_snippet_usage(info))
+                res.append(info)
+            info = None
+        else:
+            if info.first_line is None:
+                info.first_line = line.strip()
+            info.end = i
+    return res
+
+def find_snippet_usage(info):
+    res = []
+    for p in problems():
+        solution_filepath = os.path.join(p, 'solution.cpp')
+        if not os.path.isfile(solution_filepath):
+            continue
+        with open(solution_filepath, 'r') as f:
+            solution = f.read()
+        if solution.find(info.first_line) != -1:
+            res.append(os.path.basename(p))
+    return res
+
+
+def generate_list_of_snippets_md():
+    def to_table(snippets):
+        res = []
+        res.append('| Keyword | Description | Used in |')
+        res.append('| ------- | ----------- | ------- |')
+        for s in snippets:
+            used_in = ' '.join((f'[{name}]({name})' for name in s.used_in))
+            res.append(f'| [{s.keyword}]({s.filepath}#L{s.start}-L{s.end}) | {s.description} | {used_in} |')
+        return '\n'.join(res)
+        
+
+    snippets_dirpath = os.path.join(PROJECT_DIRPATH, '.misc', 'snippets')
+    snippets_filepaths = glob(os.path.join(snippets_dirpath, 'cpp_*.snippets'))
+    res = []
+    for snippet_filepath in snippets_filepaths:
+        m = re.match(r'^cpp_(.*)\.snippets$', os.path.basename(snippet_filepath))
+        if not m:
+            continue
+        category = m.group(1).upper().replace('_', ' ')
+        snippets = parse_snippet_file(snippet_filepath)
+        if not snippets:
+            continue
+        res.append(f'## {category}')
+        res.append(to_table(snippets))
+        res.append('')
+        
+    return '\n'.join(res)
     
 
 def main():
@@ -65,10 +162,19 @@ def main():
         template = f.read()
     print(template)
 
-    template = template.replace('SOLUTIONS_WITH_DESCRIPTION', problems_with_desciptions())
+    template = template.replace(
+            'SOLUTIONS_WITH_DESCRIPTION', 
+            generate_problems_with_desciptions_md())
+    template = template.replace(
+            'LIST_OF_SNIPPETS',
+            generate_list_of_snippets_md())
 
     with open(os.path.join(PROJECT_DIRPATH, 'readme.md'), 'w') as f:
         f.write(template)
+
+    for info in parse_snippets():
+        print(info)
+
 
 if __name__ == '__main__':
     main()

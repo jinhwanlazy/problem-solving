@@ -9,6 +9,8 @@ It is mainly consisted of 3 parts.
 Snippets are defined in [UltiSnips](https://github.com/SirVer/ultisnips) format.
 They are located under [`.misc/snippets/`](.misc/snippets/)
 
+LIST_OF_SNIPPETS
+
 # Solutions with description
 SOLUTIONS_WITH_DESCRIPTIONS
 
