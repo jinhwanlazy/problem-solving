@@ -1,0 +1,23 @@
+snippet algsieve "Sieve of Eratosthenes, finds all prime numbers in given range"
+struct Sieve
+{
+	Sieve(size_t max_size) : data_(max_size, true) {
+		data_[0] = false;
+		data_[1] = false;
+		for (size_t i = 2; i < max_size; ++i) {
+			if (!data_[i]) {
+				continue;
+			}
+			for (size_t j = i * 2; j < max_size; j += i) {
+				data_[j] = false;
+			}
+		}
+	}
+	
+	bool isPrime(size_t i) {
+		return data_[i];
+	}
+	
+	vector<bool> data_;
+};
+endsnippet

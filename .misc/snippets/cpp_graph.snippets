@@ -86,7 +86,7 @@ class Dijkstra {
 };
 endsnippet
 
-snippet algbellman "bellman-ford, shortest path algorithm. solution of boj_11657"
+snippet algbellman "Bellman-Ford, shortest path algorithm."
 struct Edge {
 	int u;
 	int v;
@@ -113,7 +113,7 @@ bool bellmanFord(const vector<Edge>& edges, int nVertices, int src, vector<LL>& 
 endsnippet
 
 
-snippet algfloyd "floyd-warshall, shortest path algorithm. solution of boj_11404"
+snippet algfloyd "Floyd-Warshall, shortest path algorithm"
 using LL = long long;
 constexpr static LL INF = numeric_limits<int>::max();
 
@@ -135,7 +135,7 @@ vector<vector<T>> floydWarshall(const vector<vector<T>>& adj) {
 }
 endsnippet
 
-snippet algunionfind "Union Find Set data structure. solution of boj_4195"
+snippet algunionfind "Union Find Set data structure"
 struct UnionFindSet {
 	UnionFindSet(int size) : root_(size), rank_(size, 0), size_(size, 1) {
 		for (int i = 0; i < size; ++i) {
@@ -223,7 +223,7 @@ vector<vector<int>> buildTree(const vector<vector<int>>& edges, int root) {
 }
 endsnippet
 
-snippet algtoposort "topological sort. the solution of boj_2252"
+snippet algtoposort "Topological sort algorithm"
 vector<int> topologicalSort(const vector<vector<int>>& graph) {
 	size_t N = graph.size();
 	vector<int> incomming(N, 0);
@@ -255,7 +255,7 @@ vector<int> topologicalSort(const vector<vector<int>>& graph) {
 }
 endsnippet
 
-snippet clssparsetable "Sparse table, datastructure. the solution of boj_17435"
+snippet clssparsetable "Sparse table, datastructure"
 class SparseTable {
  public:
 	vector<vector<int>> table_;
@@ -287,7 +287,7 @@ class SparseTable {
 endsnippet
 
 
-snippet alglca "lowest common ancestor algorithm, solution of boj_11438"
+snippet alglca "lowest common ancestor algorithm"
 class SparseTable {
 	vector<vector<int>> table_;
 	int maxDepth_;
@@ -358,7 +358,7 @@ class LCA {
 };
 endsnippet
 
-snippet algtarjanscc "tarjan's algorithm, find strongly connected components. solution of boj_2150"
+snippet algtarjanscc "Tarjan's strongly connected components algorithm"
 vector<vector<int>> tarjanSCC(const vector<vector<int>>& edges) {
 	struct Vertex {
 		int vid;
@@ -409,7 +409,7 @@ vector<vector<int>> tarjanSCC(const vector<vector<int>>& edges) {
 }
 endsnippet
 
-snippet alg2sat "2sat solver. solution of boj_11281"
+snippet alg2sat "2-SAT solver"
 vector<bool> twoSAT(const vector<vector<int>>& graph,
 										const function<int(int)>& neg) {
 	auto sccs = tarjanSCC(graph);
@@ -437,7 +437,7 @@ vector<bool> twoSAT(const vector<vector<int>>& graph,
 }
 endsnippet
 
-snippet algbipartite "bipartite matching algorithm. solution of boj_11375"
+snippet algbipartite "Bipartite matching algorithm"
 class BipartiteMatching {
  public:
 	const vector<vector<int>>& edges_;
@@ -498,7 +498,7 @@ class BipartiteMatching {
 endsnippet
 
 
-snippet algmaxflow "edmond karp, max flow algorithm."
+snippet algmaxflow "Edmond-Karp, max flow algorithm."
 class MaxFlow {
  public:
 	int N_;
