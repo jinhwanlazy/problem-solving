@@ -1,4 +1,4 @@
-# [BOJ 15678 연세워터파크](https://www.acmicpc.net/problem/15678)
+# [BOJ15678 - 연세워터파크](https://www.acmicpc.net/problem/15678)
 <!--tags: deque, deque dp, dp, ds, priority queue, segtree-->
 
 항상 징검다리 번호가 증가하는 방향으로 움직이는 것으로 생각해도 상관 없음.

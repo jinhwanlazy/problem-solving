@@ -1,4 +1,4 @@
-# [BOJ 5977 Mowing the Lawn](https://www.acmicpc.net/problem/5977)
+# [BOJ5977 - Mowing the Lawn](https://www.acmicpc.net/problem/5977)
 <!--tags: deque, deque dp, dp, ds-->
 
 점화식은
