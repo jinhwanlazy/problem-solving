@@ -34,7 +34,7 @@ They are located under [`.misc/snippets/`](.misc/snippets/)
 # Solutions with description
 | Name | Tags |
 | ---- | ---- |
-| [BOJ 5977 Mowing the Lawn](boj_5977) | deque, deque dp, dp, ds |
-| [BOJ 15678 연세워터파크](boj_15678) | deque, deque dp, dp, ds, priority queue, segtree |
+| [BOJ5977 - Mowing the Lawn](boj_5977) | deque, deque dp, dp, ds |
+| [BOJ15678 - 연세워터파크](boj_15678) | deque, deque dp, dp, ds, priority queue, segtree |
 | [Foobar - Power Hungry](foobar_power-hungry) | dp |
 
