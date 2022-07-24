@@ -9,7 +9,7 @@ $$
     x_i = \max{\left( K_i, \max_{i-D \le j < i}{K_i + x_j} \right)}
 $$
 
-$D$가 최대 N이므로 naive한 solution은 $O(N^2)$. 
+$D$가 최대 $N$이므로 naive한 solution은 $O(N^2)$. 
 
 위 식의 $\max_{i-D \le j < i}{x_j}$ 부분만 따로 떼서 생각하면, 이것은 monotone
-queue technique을 사용해 $O(N)에 구할 수 있다.
+queue technique을 사용해 $O(N)$에 구할 수 있다.
