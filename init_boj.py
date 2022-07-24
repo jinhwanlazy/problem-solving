@@ -138,7 +138,7 @@ def init_problem(pid, src, verbose=False):
                 f.write(out_)
 
     # generate readme.md
-    readme = f'''# [{src.upper()} {pid} {problem.alt_name() if problem.alt_name() else problem.name()}]({problem.url()})
+    readme = f'''# [{src.upper()}{pid} - {problem.alt_name() if problem.alt_name() else problem.name()}]({problem.url()})
 <!--tags: {', '.join(problem.tags())}-->
 '''
     readme_filepath = os.path.join(problem.dirpath(), 'readme.md')

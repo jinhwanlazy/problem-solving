@@ -1,5 +1,5 @@
-# [Power Hungry](https://foobar.withgoogle.com/)
-<!-- tags: dp -->
+# [Foobar - Power Hungry](https://foobar.withgoogle.com/)
+<!--tags: dp-->
 
 배열의 non-empty subset의 product중 최대값을 찾는 문제.
 
