@@ -1,2 +1,2 @@
-# [BOJ 12852 1로 만들기 2](https://www.acmicpc.net/problem/12852)
+# [BOJ12852 - 1로 만들기 2](https://www.acmicpc.net/problem/12852)
 <!--tags: dp, graph, traversal-->

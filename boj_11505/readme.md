@@ -1,2 +1,2 @@
-# [BOJ 11505 구간 곱 구하기](https://www.acmicpc.net/problem/11505)
+# [BOJ11505 - 구간 곱 구하기](https://www.acmicpc.net/problem/11505)
 <!--tags: ds, segtree-->

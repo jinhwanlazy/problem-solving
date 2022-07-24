@@ -1,2 +1,2 @@
-# [BOJ 11866 요세푸스 문제 0](https://www.acmicpc.net/problem/11866)
+# [BOJ11866 - 요세푸스 문제 0](https://www.acmicpc.net/problem/11866)
 <!--tags: ds, impl, queue-->

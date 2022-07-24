@@ -1,2 +1,2 @@
-# [BOJ 14888 연산자 끼워넣기](https://www.acmicpc.net/problem/14888)
+# [BOJ14888 - 연산자 끼워넣기](https://www.acmicpc.net/problem/14888)
 <!--tags: backtrack, bruteforce-->

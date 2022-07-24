@@ -1,2 +1,2 @@
-# [BOJ 11779 최소비용 구하기 2](https://www.acmicpc.net/problem/11779)
+# [BOJ11779 - 최소비용 구하기 2](https://www.acmicpc.net/problem/11779)
 <!--tags: dijkstra's, graph-->
