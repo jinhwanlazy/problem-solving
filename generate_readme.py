@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import List
 
 PREFIX = [
-    'boj', 'swea', 'leet', 'cf',
+    'boj', 'swea', 'leet', 'cf', 'foobar',
 ]
 
 ALGORITHMS = {
@@ -34,7 +34,10 @@ def problems():
 
 def generate_problems_with_desciptions_md():
     def parse_name(lines):
-        return re.search(r'\[(.+)\]', lines[0][2:]).group(1)
+        try:
+            return re.search(r'\[(.+)\]', lines[0][2:]).group(1)
+        except:
+            return lines[0].strip()
 
     def parse_tags(lines):
         for line in lines:
