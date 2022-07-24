@@ -6,7 +6,7 @@ $x_i$ 를 i번째 징검다리를 밟았을 때 [1, i]구간에서 얻을 수 �
 최대값이라고 하면 점화식은
 
 $$
-    x_i = \max{K_i, \max_{i-D \le j < i}{K_i + x_j}}
+    x_i = \max{\left( K_i, \max_{i-D \le j < i}{K_i + x_j} \right)}
 $$
 
 $D$가 최대 N이므로 naive한 solution은 $O(N^2)$. 
