@@ -20,10 +20,10 @@ They are located under [`.misc/snippets/`](.misc/snippets/)
 | Keyword | Description | Used in |
 | ------- | ----------- | ------- |
 | [algdijkstra](.misc/snippets/cpp_graph.snippets#L14) | Dijkstra's shortest path algorithm | [boj_1753](boj_1753) |
-| [algunionfind](.misc/snippets/cpp_graph.snippets#L138) | Union Find Set data structure | [boj_1043](boj_1043) [boj_1197](boj_1197) [boj_1647](boj_1647) [boj_1717](boj_1717) [boj_1774](boj_1774) [boj_1976](boj_1976) [boj_2162](boj_2162) [boj_2887](boj_2887) [boj_4195](boj_4195) [boj_4386](boj_4386) [boj_9372](boj_9372) [boj_10216](boj_10216) [boj_17472](boj_17472) [boj_20040](boj_20040) |
-| [algtoposort](.misc/snippets/cpp_graph.snippets#L226) | Topological sort algorithm | [boj_1766](boj_1766) [boj_2252](boj_2252) |
-| [algtarjanscc](.misc/snippets/cpp_graph.snippets#L361) | Tarjan's strongly connected components algorithm | [boj_2150](boj_2150) [boj_3648](boj_3648) [boj_3977](boj_3977) [boj_4013](boj_4013) [boj_4196](boj_4196) [boj_11280](boj_11280) [boj_11281](boj_11281) [boj_16367](boj_16367) |
-| [algbipartite](.misc/snippets/cpp_graph.snippets#L440) | Bipartite matching algorithm | [boj_1014](boj_1014) [boj_1017](boj_1017) [boj_1671](boj_1671) [boj_1867](boj_1867) [boj_2188](boj_2188) [boj_11014](boj_11014) [boj_11375](boj_11375) [boj_11376](boj_11376) [boj_11377](boj_11377) [boj_11378](boj_11378) [boj_14750](boj_14750) |
+| [algunionfind](.misc/snippets/cpp_graph.snippets#L146) | Union Find Set data structure | [boj_1043](boj_1043) [boj_1197](boj_1197) [boj_1647](boj_1647) [boj_1717](boj_1717) [boj_1774](boj_1774) [boj_1976](boj_1976) [boj_2162](boj_2162) [boj_2887](boj_2887) [boj_4195](boj_4195) [boj_4386](boj_4386) [boj_9372](boj_9372) [boj_10216](boj_10216) [boj_17472](boj_17472) [boj_20040](boj_20040) |
+| [algtoposort](.misc/snippets/cpp_graph.snippets#L234) | Topological sort algorithm | [boj_1766](boj_1766) [boj_2252](boj_2252) |
+| [algtarjanscc](.misc/snippets/cpp_graph.snippets#L369) | Tarjan's strongly connected components algorithm | [boj_2150](boj_2150) [boj_3648](boj_3648) [boj_3977](boj_3977) [boj_4013](boj_4013) [boj_4196](boj_4196) [boj_11280](boj_11280) [boj_11281](boj_11281) [boj_16367](boj_16367) |
+| [algbipartite](.misc/snippets/cpp_graph.snippets#L448) | Bipartite matching algorithm | [boj_1014](boj_1014) [boj_1017](boj_1017) [boj_1671](boj_1671) [boj_1867](boj_1867) [boj_2188](boj_2188) [boj_11014](boj_11014) [boj_11375](boj_11375) [boj_11376](boj_11376) [boj_11377](boj_11377) [boj_11378](boj_11378) [boj_14750](boj_14750) |
 
 ## STRING
 | Keyword | Description | Used in |
@@ -34,6 +34,7 @@ They are located under [`.misc/snippets/`](.misc/snippets/)
 # Solutions with description
 | Name | Tags |
 | ---- | ---- |
+| [BOJ1074 - Z](boj_1074) | morton code, Z-order |
 | [BOJ5977 - Mowing the Lawn](boj_5977) | deque, deque dp, dp, ds |
 | [BOJ15678 - 연세워터파크](boj_15678) | deque, deque dp, dp, ds, priority queue, segtree |
 | [Foobar - Power Hungry](foobar_power-hungry) | dp |
