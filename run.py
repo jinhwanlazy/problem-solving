@@ -80,7 +80,7 @@ class CppSolution(Solution):
         start_time = datetime.now()
         cmd = ['g++-11', 
             '-O2',
-            '-std=c++17',
+            '-std=c++20',
             '-Wall', 
             '-Weffc++',
             '-fdiagnostics-color=always', 
