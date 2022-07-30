@@ -39,3 +39,34 @@ int LCS(const string& A, const string& B, string* trace=nullptr)
 }
 endsnippet
 
+snippet algfloodfill2d "2D flood fill"
+int floodFill(vector<vector<int>>& grid, int src, int dst) {
+	int count = 0;
+	int h = grid.size();
+	int w = grid[0].size();
+	for (int i = 0; i < grid.size(); ++i) {
+		for (int j = 0; j < grid[0].size(); ++j) {
+			if (grid[i][j] != src) {
+				continue;
+			}
+			count++;
+			grid[i][j] = dst;
+			queue<pair<int, int>> q;
+			q.push({i, j});
+			while (!q.empty()) {
+				auto [i_, j_] = q.front(); q.pop();
+				for (int k = 0; k < 4; ++k) {
+					int ii = i_ + di[k];
+					int jj = j_ + dj[k];
+					if (0 <= ii && ii < h && 0 <= jj && jj < w && grid[ii][jj] == src) {
+						grid[ii][jj] = dst;
+						q.push({ii, jj});
+					}
+				}
+			}
+		}
+	}
+	return count;
+}
+endsnippet
+
