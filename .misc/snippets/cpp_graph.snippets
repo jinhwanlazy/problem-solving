@@ -87,29 +87,48 @@ class Dijkstra {
 endsnippet
 
 snippet algbellman "Bellman-Ford, shortest path algorithm."
-struct Edge {
-	int u;
-	int v;
-	LL cost;
-};
+class BellmanFord {
+	using cost_t = LL;
 
-bool bellmanFord(const vector<Edge>& edges, int nVertices, int src, vector<LL>& cost) {
-	cost.resize(nVertices);
-	fill(cost.begin(), cost.end(), INF);
-	cost[src] = true;
+ public:
+	struct Edge {
+		int u;
+		int v;
+		cost_t c;
+	};
 
-	for (int i = 0; i < nVertices; ++i) {
-		for (const auto& [u, v, c] : edges) {
-			if (cost[u] != INF && cost[v] > cost[u] + c) {
-				cost[v] = cost[u] + c;
-				if (i == nVertices-1) {
-					return false;
+ private:
+	int nVertices_;
+	int src_;
+	vector<Edge> edges_;
+	vector<cost_t> costs_ = {};
+
+ public:
+	BellmanFord(int nVertices, int src = 0, const vector<Edge>& edges = {})
+			: nVertices_(nVertices), src_(src), edges_(edges) {}
+
+	void setSrc(int src) { src_ = src; }
+	void setNVertices(int nVertices) { nVertices_ = nVertices; }
+	void addEdge(int u, int v, cost_t c) { edges_.emplace_back(u, v, c); }
+
+	bool solve() {
+		costs_.resize(nVertices_);
+		fill(costs_.begin(), costs_.end(), INF);
+		costs_[src_] = 0;
+
+		for (int i = 0; i < nVertices_; ++i) {
+			for (const auto& [u, v, c] : edges_) {
+				if (costs_[u] != INF && costs_[v] > costs_[u] + c) {
+					costs_[v] = costs_[u] + c;
+					if (i == nVertices_ - 1) {
+						return false;
+					}
 				}
 			}
 		}
+		return true;
 	}
-	return true;
-}
+};
 endsnippet
 
 
@@ -448,31 +467,28 @@ endsnippet
 snippet algbipartite "Bipartite matching algorithm"
 class BipartiteMatching {
  public:
-	const vector<vector<int>>& edges_;
+	const vector<vector<int>>& graph_;
 	size_t nDst_;
 	vector<int> matches_;
-	vector<bool> visited_;
 
  public:
-	BipartiteMatching(const vector<vector<int>>& edges, int nDst = -1)
-			: edges_(edges), nDst_(nDst) {
+	BipartiteMatching(const vector<vector<int>>& graph, int nDst = -1) : graph_(graph), nDst_(nDst) {
 		if (nDst_ == -1) {
 			nDst_ = 0;
-			for (int i = 0; i < edges.size(); ++i) {
-				for (int w : edges[i]) {
-					nDst_ = max(nDst_, (size_t)(w+1));
+			for (int i = 0; i < graph.size(); ++i) {
+				for (int w : graph[i]) {
+					nDst_ = max(nDst_, (size_t)(w + 1));
 				}
 			}
 		}
 		matches_.resize(nDst, -1);
-		visited_.resize(nDst, false);
 	}
 
 	size_t solve() {
 		size_t res = 0;
-		for (size_t i = 0; i < edges_.size(); ++i) {
-			fill(all(visited_), false);
-			res += dfs(i);
+		vector<bool> visited(nDst_, false);
+		for (size_t i = 0; i < graph_.size(); ++i) {
+			res += dfs(i, visited);
 		}
 		return res;
 	}
@@ -489,13 +505,13 @@ class BipartiteMatching {
 	}
 
  private:
-	bool dfs(int src) {
-		for (int dst : edges_[src]) {
-			if (visited_[dst]) {
+	bool dfs(int src, vector<bool>& visited) {
+		for (int dst : graph_[src]) {
+			if (visited[dst]) {
 				continue;
 			}
-			visited_[dst] = true;
-			if (matches_[dst] == -1 || dfs(matches_[dst])) {
+			visited[dst] = true;
+			if (matches_[dst] == -1 || dfs(matches_[dst], visited)) {
 				matches_[dst] = src;
 				return true;
 			}

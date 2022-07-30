@@ -1,60 +1,77 @@
 #include <bits/stdc++.h>
 using namespace std;
+
 using LL = long long;
-constexpr static LL INF = numeric_limits<LL>::max() >> 1;
+constexpr static LL INF = numeric_limits<LL>::max() / 2;
 
-struct Edge {
-  int u;
-  int v;
-  LL cost;
-};
+class BellmanFord {
+  using cost_t = LL;
 
-bool bellmanFord(const vector<Edge>& edges, int nVertices, int src, vector<LL>& cost) {
-  cost.resize(nVertices);
-  fill(cost.begin(), cost.end(), INF);
-  cost[src] = true;
+ public:
+  struct Edge {
+    int u;
+    int v;
+    cost_t c;
+  };
 
-  for (int i = 0; i < nVertices; ++i) {
-    for (const auto& [u, v, c] : edges) {
-      if (cost[u] != INF && cost[v] > cost[u] + c) {
-        cost[v] = cost[u] + c;
-        if (i == nVertices-1) {
-          return false;
+ private:
+  int nVertices_;
+  int src_;
+  vector<Edge> edges_;
+  vector<cost_t> costs_ = {};
+
+ public:
+  BellmanFord(int nVertices, int src = 0, const vector<Edge>& edges = {})
+      : nVertices_(nVertices), src_(src), edges_(edges) {}
+
+  void setSrc(int src) { src_ = src; }
+  void setNVertices(int nVertices) { nVertices_ = nVertices; }
+  void addEdge(int u, int v, cost_t c) { edges_.emplace_back(u, v, c); }
+
+  bool solve() {
+    costs_.resize(nVertices_);
+    fill(costs_.begin(), costs_.end(), INF);
+    costs_[src_] = 0;
+
+    for (int i = 0; i < nVertices_; ++i) {
+      for (const auto& [u, v, c] : edges_) {
+        if (costs_[u] != INF && costs_[v] > costs_[u] + c) {
+          costs_[v] = costs_[u] + c;
+          if (i == nVertices_ - 1) {
+            return false;
+          }
         }
       }
     }
+    return true;
   }
-  return true;
-}
-
+};
 
 void solve() {
   int N, M, W;
   scanf("%d %d %d", &N, &M, &W);
-  
-  vector<Edge> edges;
+
+  BellmanFord bm(N, 0);
   for (int i = 0; i < M; ++i) {
-    int u, v;
-    LL w;
-    scanf("%d %d %lld", &u, &v, &w);
-    u--; v--;
-    edges.push_back({u, v, w});
-    edges.push_back({v, u, w});
+    int u, v, c;
+    scanf("%d %d %d", &u, &v, &c);
+    u--;
+    v--;
+    bm.addEdge(u, v, c);
+    bm.addEdge(v, u, c);
   }
 
   for (int i = 0; i < W; ++i) {
-    int u, v;
-    LL w;
-    scanf("%d %d %lld", &u, &v, &w);
-    u--; v--;
-    edges.push_back({u, v, -w});
+    int u, v, c;
+    scanf("%d %d %d", &u, &v, &c);
+    u--;
+    v--;
+    bm.addEdge(u, v, -c);
   }
 
-  vector<LL> cost;
-  if (bellmanFord(edges, N, 0, cost)) {
+  if (bm.solve()) {
     printf("NO\n");
-  }
-  else {
+  } else {
     printf("YES\n");
   }
 }

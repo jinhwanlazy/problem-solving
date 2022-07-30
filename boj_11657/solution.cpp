@@ -2,50 +2,67 @@
 using namespace std;
 
 using LL = long long;
-constexpr static LL INF = numeric_limits<LL>::max();
+constexpr static LL INF = numeric_limits<LL>::max() / 2;
 
-struct Edge {
-  int u;
-  int v;
-  LL cost;
-};
+class BellmanFord {
+  using cost_t = LL;
 
-vector<LL> bellmanFord(const vector<Edge>& edges, int nVertices, int src) {
-  vector<LL> cost(nVertices, INF);
-  cost[src] = 0;
+ public:
+  struct Edge {
+    int u;
+    int v;
+    cost_t c;
+  };
 
-  for (int i = 0; i < nVertices; ++i) {
-    for (const auto& [u, v, c] : edges) {
-      if (cost[u] != INF && cost[v] > cost[u] + c) {
-        cost[v] = cost[u] + c;
-        if (i == nVertices-1) {
-          return {};
+  int nVertices_;
+  int src_;
+  vector<Edge> edges_;
+  vector<cost_t> costs_ = {};
+
+  BellmanFord(int nVertices, int src = 0, const vector<Edge>& edges = {})
+      : nVertices_(nVertices), src_(src), edges_(edges) {}
+
+  void setSrc(int src) { src_ = src; }
+  void setNVertices(int nVertices) { nVertices_ = nVertices; }
+  void addEdge(int u, int v, cost_t c) { edges_.emplace_back(u, v, c); }
+
+  bool solve() {
+    costs_.resize(nVertices_);
+    fill(costs_.begin(), costs_.end(), INF);
+    costs_[src_] = 0;
+
+    for (int i = 0; i < nVertices_; ++i) {
+      for (const auto& [u, v, c] : edges_) {
+        if (costs_[u] != INF && costs_[v] > costs_[u] + c) {
+          costs_[v] = costs_[u] + c;
+          if (i == nVertices_ - 1) {
+            return false;
+          }
         }
       }
     }
+    return true;
   }
-  return cost;
-}
+};
+
 
 int main() {
   int N, M;
   scanf("%d %d", &N, &M);
 
-  vector<Edge> edges;
-  edges.reserve(M);
+  BellmanFord bm(N, 0);
   for (int i = 0; i < M; ++i) {
-    int A, B, C;
-    scanf("%d %d %d", &A, &B, &C);
-    A--; B--;
-    edges.push_back({A, B, C});
+    int u, v, c;
+    scanf("%d %d %d", &u, &v, &c);
+    u--; v--;
+    bm.addEdge(u, v, c);
   }
 
-  auto cost = bellmanFord(edges, N, 0);
-  if (cost.empty()) {
+  if (!bm.solve()) {
     printf("%d\n", -1);
   } else {
     for (int i = 1; i < N; ++i) {
-      printf("%lld\n", cost[i] == INF ? -1 : cost[i]);
+      printf("%lld\n", bm.costs_[i] == INF ? -1 : bm.costs_[i]);
     }
   }
 
