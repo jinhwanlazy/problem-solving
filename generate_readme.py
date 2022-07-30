@@ -9,9 +9,19 @@ PREFIX = [
 ]
 
 ALGORITHMS = {
-    'algdijkstra', 'algunionfind', 'algtoposort', 'algtarjanscc',
-    'algbipartite', 'algkmp',
+    # graph - shortest path
+    'algdijkstra', 'algbellman', 'algspfa'
 
+    # graph - flow & matching
+    "algmcmf", 'algbipartite', 
+
+    # graph
+    'algunionfind', 'algtoposort', 'algtarjanscc',
+
+    # string
+    'algkmp',
+
+    # 2d geometry
     'algconvexhull', 'algrotatingcalipers', 'algshoelace',
 }
 
