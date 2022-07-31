@@ -41,6 +41,5 @@ They are located under [`.misc/snippets/`](.misc/snippets/)
 | [BOJ5977 - Mowing the Lawn](boj_5977) | deque, deque dp, dp, ds |
 | [BOJ15678 - 연세워터파크](boj_15678) | deque, deque dp, dp, ds, priority queue, segtree |
 | [Foobar - Doomsday Fuel](foobar_doomsday-fuel) | math, markov chain |
-| [Foobar - Find the Access Codes](foobar_find-the-access-codes) | dp |
 | [Foobar - Power Hungry](foobar_power-hungry) | dp |
 
