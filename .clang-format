@@ -1,6 +1,6 @@
 ---
 BasedOnStyle: Chromium
-ColumnLimit:  100
+ColumnLimit:  80
 Language:     Cpp
 LambdaBodyIndentation: OuterScope
 
