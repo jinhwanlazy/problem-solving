@@ -13,7 +13,7 @@ ALGORITHMS = {
     'algdijkstra', 'algbellman', 'algspfa'
 
     # graph - flow & matching
-    "algmcmf", 'algbipartite', 
+    "algmcmf", 'algbipartite', 'algdinic', 'algedmondskarp',
 
     # graph
     'algunionfind', 'algtoposort', 'algtarjanscc',

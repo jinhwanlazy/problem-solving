@@ -25,6 +25,8 @@ They are located under [`.misc/snippets/`](.misc/snippets/)
 | [algtoposort](.misc/snippets/cpp_graph.snippets#L316) | Topological sort algorithm | [boj_1766](boj_1766) [boj_2252](boj_2252) |
 | [algtarjanscc](.misc/snippets/cpp_graph.snippets#L451) | Tarjan's strongly connected components algorithm | [boj_2150](boj_2150) [boj_3648](boj_3648) [boj_3977](boj_3977) [boj_4013](boj_4013) [boj_4196](boj_4196) [boj_11280](boj_11280) [boj_11281](boj_11281) [boj_16367](boj_16367) |
 | [algbipartite](.misc/snippets/cpp_graph.snippets#L530) | Bipartite matching algorithm | [boj_1014](boj_1014) [boj_1017](boj_1017) [boj_1671](boj_1671) [boj_1867](boj_1867) [boj_2188](boj_2188) [boj_11014](boj_11014) [boj_11375](boj_11375) [boj_11376](boj_11376) [boj_11377](boj_11377) [boj_11378](boj_11378) [boj_14750](boj_14750) |
+| [algedmondskarp](.misc/snippets/cpp_graph.snippets#L588) | Edmonds-Karp, max flow algorithm. |  |
+| [algdinic](.misc/snippets/cpp_graph.snippets#L771) | Dinic's max flow algorithm. | [boj_1420](boj_1420) [boj_2365](boj_2365) [boj_6086](boj_6086) [boj_13161](boj_13161) |
 
 ## STRING
 | Keyword | Description | Used in |
