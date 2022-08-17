@@ -1,0 +1,129 @@
+snippet algcombinations "Combinations"
+class Combinations {
+	int N_;
+	int M_;
+	vector<int> res_;
+
+ public:
+	Combinations(int N, int M) : N_(N), M_(M), res_(M) {
+		iota(res_.begin(), res_.end(), 0);
+	}
+
+	bool next() {
+		if (res_.front() == N_ - M_) {
+			return false;
+		}
+
+		auto it = res_.end();
+
+		while (*(--it) == N_ - (res_.end() - it))
+			continue;
+		(*it)++;
+		while (++it != res_.end())
+			*it = *(it - 1) + 1;
+		return true;
+	}
+
+	const vector<int>& get() const { return res_; }
+};
+endsnippet
+
+snippet algcombinationswithreplacement "Combinations with replacement"
+class CombinationsWithReplacement {
+	int N_;
+	int M_;
+	vector<int> res_;
+
+ public:
+	CombinationsWithReplacement(int N, int M) : N_(N), M_(M), res_(M, 0) {
+	}
+
+	bool next() {
+		if (res_.front() == N_-1) {
+			return false;
+		}
+
+		auto it = res_.end();
+
+		while (it > res_.begin() && *(--it) == N_ - 1)
+			continue;
+		(*it)++;
+		while (++it != res_.end())
+			*it = *(it - 1);
+		return true;
+	}
+
+	const vector<int>& get() const { return res_; }
+};
+endsnippet
+
+
+snippet algpermutations "Permutations"
+class Permutations {
+	int N_;
+	int M_;
+	vector<int> arr_;
+	vector<int> res_;
+
+ public:
+	Permutations(int N, int M) : N_(N), M_(M), arr_(N), res_(M_) {
+		iota(arr_.begin(), arr_.end(), 0);
+		iota(res_.begin(), res_.end(), 0);
+	}
+
+	// https://stackoverflow.com/a/61402151
+	bool next_partial_permutation(std::vector<int>::iterator beg,
+																std::vector<int>::iterator mid,
+																std::vector<int>::iterator end) {
+		if (beg == mid) {
+			return false;
+		}
+		if (mid == end) {
+			return std::next_permutation(beg, end);
+		}
+
+		auto p1 = mid;
+
+		while (p1 != end && !(*(mid - 1) < *p1))
+			++p1;
+
+		if (p1 != end) {
+			std::swap(*p1, *(mid - 1));
+			return true;
+		} else {
+			std::reverse(mid, end);
+			auto p3 = std::make_reverse_iterator(mid);
+
+			while (p3 != std::make_reverse_iterator(beg) && !(*p3 < *(p3 - 1)))
+				++p3;
+
+			if (p3 == std::make_reverse_iterator(beg)) {
+				std::reverse(beg, end);
+				return false;
+			}
+
+			auto p2 = end - 1;
+
+			while (!(*p3 < *p2))
+				--p2;
+
+			std::swap(*p3, *p2);
+			std::reverse(p3.base(), end);
+			return true;
+		}
+	}
+
+	bool next() {
+		bool success = next_partial_permutation(arr_.begin(), arr_.begin() + M_, arr_.end());
+		if (!success) {
+			return false;
+		}
+		copy(arr_.begin(), arr_.begin() + M_, res_.begin());
+		return true;
+	}
+
+	const vector<int>& get() const {
+		return res_;
+	}
+};
+endsnippet

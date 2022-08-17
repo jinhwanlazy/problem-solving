@@ -47,33 +47,29 @@ struct State{
   MoveResult move(const Coord& direction) {
     Coord blueBak = blue;
     Coord redBak = red;
-    while (true) {
-      bool done = true;
+    bool done = false;
+    while (!done) {
+      done = true;
       Coord tmp = blue + direction;
-      if (valid(tmp)) {
+      if (valid(tmp) && tmp != red) {
         switch (grid[tmp.i][tmp.j]) {
           case 'O': blue = OUT; done = false; break;
           case '.': blue = tmp; done = false; break;
           case '#': break;
-          case 'R': break;
           default: throw runtime_error("You cannot reach here!");
         }
       }
       tmp = red + direction;
-      if (valid(tmp)) {
+      if (valid(tmp) && tmp != blue) {
         switch (grid[tmp.i][tmp.j]) {
           case 'O': red = OUT; done = false; break;
           case '.': red = tmp; done = false; break;
           case '#': break;
-          case 'R': break;
           default: throw runtime_error("You cannot reach here!");
         }
       }
       if (red == redBak && blue == blueBak) {
         return MoveResult::Stuck;
-      }
-      if (done) {
-        break;
       }
     }
     if (!valid(blue)) {
@@ -113,8 +109,8 @@ void solve() {
     State s = Q.front();
     Q.pop();
 
-    printf("%d %d %d\n", s.red.i, s.red.j, s.depth);
-    
+    //printf("(%d %d) (%d %d) %d\n", s.blue.i, s.blue.j, s.red.i, s.red.j, s.depth);
+  
     for (const Coord& direction : dirs) {
       State ss = s;
       ss.depth += 1;
