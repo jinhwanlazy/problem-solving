@@ -18,8 +18,14 @@ ALGORITHMS = {
     # graph
     'algunionfind', 'algtoposort', 'algtarjanscc',
 
+    # number theory
+    'algsieve',
+
     # string
     'algkmp',
+
+    # tree
+    'clssegtree', 'clsfenwicktree',
 
     # 2d geometry
     'algconvexhull', 'algrotatingcalipers', 'algshoelace',

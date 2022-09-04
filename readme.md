@@ -28,6 +28,11 @@ They are located under [`.misc/snippets/`](.misc/snippets/)
 | [algedmondskarp](.misc/snippets/cpp_graph.snippets#L588) | Edmonds-Karp, max flow algorithm. |  |
 | [algdinic](.misc/snippets/cpp_graph.snippets#L771) | Dinic's max flow algorithm. | [boj_1420](boj_1420) [boj_2365](boj_2365) [boj_6086](boj_6086) [boj_11495](boj_11495) [boj_13161](boj_13161) |
 
+## NUMBER THEORY
+| Keyword | Description | Used in |
+| ------- | ----------- | ------- |
+| [algsieve](.misc/snippets/cpp_number_theory.snippets#L1) | Sieve of Eratosthenes, finds all prime numbers in given range | [boj_1644](boj_1644) [boj_17104](boj_17104) [boj_17134](boj_17134) |
+
 ## STRING
 | Keyword | Description | Used in |
 | ------- | ----------- | ------- |
@@ -37,8 +42,14 @@ They are located under [`.misc/snippets/`](.misc/snippets/)
 | Keyword | Description | Used in |
 | ------- | ----------- | ------- |
 | [alglis](.misc/snippets/cpp_others.snippets#L73) | LIS, longest incereasing subsequence algorithm | [boj_2352](boj_2352) [boj_2568](boj_2568) [boj_14002](boj_14002) |
-| [algfft](.misc/snippets/cpp_others.snippets#L118) | FFT, Fast Fourier Transform algorithm | [boj_16287](boj_16287) |
+| [algfft](.misc/snippets/cpp_others.snippets#L118) | FFT, Fast Fourier Transform algorithm | [boj_16287](boj_16287) [boj_17104](boj_17104) [boj_17134](boj_17134) [boj_20176](boj_20176) |
 | [algbigint](.misc/snippets/cpp_others.snippets#L155) | Big integer class | [boj_15576](boj_15576) [boj_15740](boj_15740) |
+
+## TREE
+| Keyword | Description | Used in |
+| ------- | ----------- | ------- |
+| [clssegtree](.misc/snippets/cpp_tree.snippets#L1) | Segment tree class | [boj_1168](boj_1168) [boj_2042](boj_2042) [boj_2357](boj_2357) [boj_5419](boj_5419) [boj_7626](boj_7626) [boj_9345](boj_9345) [boj_11403](boj_11403) [boj_11505](boj_11505) [boj_12899](boj_12899) [boj_14428](boj_14428) [boj_16975](boj_16975) [boj_17131](boj_17131) [cf_1679c](cf_1679c) |
+| [clsfenwicktree](.misc/snippets/cpp_tree.snippets#L88) | Fenwick tree, binary indexed tree | [boj_2042](boj_2042) [boj_2243](boj_2243) [boj_11012](boj_11012) |
 
 
 # Solutions with description
