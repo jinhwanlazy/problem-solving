@@ -15,6 +15,7 @@ B^{P - 1} \equiv 1 \mod P
 $$
 
 위 식을 적절히 변형하면
+
 $$
 \begin{align}
     B B^{P-2} & \equiv 1 \mod P \\
@@ -29,7 +30,6 @@ $$
 {n \choose k} &\equiv \prod_{i=k+1}^{n}i \(n-k\)!^{-1} \mod P \\
               &\equiv \prod_{i=k+1}^{n}i \(n-k\)!^{P-2} \mod P
 \end{align}
-
 $$
 
 이 된다. 
