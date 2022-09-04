@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-template <unsigned BASE=100000000> 
+template <unsigned BASE=100000000> // BigInteger
 class BigInteger {
   using base_t = unsigned long long;
  public:

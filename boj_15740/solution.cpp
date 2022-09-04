@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-template<unsigned BASE=1000000000> // BigInteger
+template <unsigned BASE=100000000> // BigInteger
 class BigInteger {
   using base_t = unsigned long long;
  public:
@@ -187,7 +187,7 @@ class BigInteger {
     return ostr;
   }
 
-  void desc() const {
+  void show() const {
     cout << "BigInteger(sign: " << sign() << ", vals: ";
     for (unsigned c : data_) {
       cout << c << ", ";
@@ -252,7 +252,6 @@ class BigInteger {
 
   static void iFFT(vector<C>& f) { return FFT(f, 1); }
 };
-
 
 void solve() {
   BigInteger<10> A, B;

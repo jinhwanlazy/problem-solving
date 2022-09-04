@@ -21,17 +21,24 @@ They are located under [`.misc/snippets/`](.misc/snippets/)
 | ------- | ----------- | ------- |
 | [algdijkstra](.misc/snippets/cpp_graph.snippets#L14) | Dijkstra's shortest path algorithm | [boj_1753](boj_1753) |
 | [algbellman](.misc/snippets/cpp_graph.snippets#L89) | Bellman-Ford, shortest path algorithm. | [boj_1865](boj_1865) [boj_11657](boj_11657) |
-| [algunionfind](.misc/snippets/cpp_graph.snippets#L228) | Union Find Set data structure | [boj_1043](boj_1043) [boj_1197](boj_1197) [boj_1647](boj_1647) [boj_1717](boj_1717) [boj_1774](boj_1774) [boj_1976](boj_1976) [boj_2162](boj_2162) [boj_2887](boj_2887) [boj_4195](boj_4195) [boj_4386](boj_4386) [boj_9372](boj_9372) [boj_10216](boj_10216) [boj_17472](boj_17472) [boj_20040](boj_20040) |
-| [algtoposort](.misc/snippets/cpp_graph.snippets#L316) | Topological sort algorithm | [boj_1766](boj_1766) [boj_2252](boj_2252) |
-| [algtarjanscc](.misc/snippets/cpp_graph.snippets#L451) | Tarjan's strongly connected components algorithm | [boj_2150](boj_2150) [boj_3648](boj_3648) [boj_3977](boj_3977) [boj_4013](boj_4013) [boj_4196](boj_4196) [boj_11280](boj_11280) [boj_11281](boj_11281) [boj_16367](boj_16367) |
+| [algunionfind](.misc/snippets/cpp_graph.snippets#L228) | Union Find Set data structure | [boj_1043](boj_1043) [boj_1197](boj_1197) [boj_1647](boj_1647) [boj_1717](boj_1717) [boj_1774](boj_1774) [boj_1976](boj_1976) [boj_2162](boj_2162) [boj_2887](boj_2887) [boj_4195](boj_4195) [boj_4386](boj_4386) [boj_9372](boj_9372) [boj_10216](boj_10216) [boj_16724](boj_16724) [boj_17472](boj_17472) [boj_20040](boj_20040) |
+| [algtoposort](.misc/snippets/cpp_graph.snippets#L316) | Topological sort algorithm | [boj_1766](boj_1766) [boj_2252](boj_2252) [boj_2623](boj_2623) |
+| [algtarjanscc](.misc/snippets/cpp_graph.snippets#L451) | Tarjan's strongly connected components algorithm | [boj_2150](boj_2150) [boj_3648](boj_3648) [boj_3977](boj_3977) [boj_4013](boj_4013) [boj_4196](boj_4196) [boj_9466](boj_9466) [boj_11280](boj_11280) [boj_11281](boj_11281) [boj_16367](boj_16367) |
 | [algbipartite](.misc/snippets/cpp_graph.snippets#L530) | Bipartite matching algorithm | [boj_1014](boj_1014) [boj_1017](boj_1017) [boj_1671](boj_1671) [boj_1867](boj_1867) [boj_2188](boj_2188) [boj_11014](boj_11014) [boj_11375](boj_11375) [boj_11376](boj_11376) [boj_11377](boj_11377) [boj_11378](boj_11378) [boj_14750](boj_14750) |
 | [algedmondskarp](.misc/snippets/cpp_graph.snippets#L588) | Edmonds-Karp, max flow algorithm. |  |
-| [algdinic](.misc/snippets/cpp_graph.snippets#L771) | Dinic's max flow algorithm. | [boj_1420](boj_1420) [boj_2365](boj_2365) [boj_6086](boj_6086) [boj_13161](boj_13161) |
+| [algdinic](.misc/snippets/cpp_graph.snippets#L771) | Dinic's max flow algorithm. | [boj_1420](boj_1420) [boj_2365](boj_2365) [boj_6086](boj_6086) [boj_11495](boj_11495) [boj_13161](boj_13161) |
 
 ## STRING
 | Keyword | Description | Used in |
 | ------- | ----------- | ------- |
 | [algkmp](.misc/snippets/cpp_string.snippets#L1) | KMP, string search algorithm | [boj_1305](boj_1305) [boj_1786](boj_1786) [boj_4354](boj_4354) [boj_5525](boj_5525) |
+
+## OTHERS
+| Keyword | Description | Used in |
+| ------- | ----------- | ------- |
+| [alglis](.misc/snippets/cpp_others.snippets#L73) | LIS, longest incereasing subsequence algorithm | [boj_2352](boj_2352) [boj_2568](boj_2568) [boj_14002](boj_14002) |
+| [algfft](.misc/snippets/cpp_others.snippets#L118) | FFT, Fast Fourier Transform algorithm | [boj_16287](boj_16287) |
+| [algbigint](.misc/snippets/cpp_others.snippets#L155) | Big integer class | [boj_15576](boj_15576) [boj_15740](boj_15740) |
 
 
 # Solutions with description

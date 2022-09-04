@@ -23,6 +23,9 @@ ALGORITHMS = {
 
     # 2d geometry
     'algconvexhull', 'algrotatingcalipers', 'algshoelace',
+
+    # others
+    'alglis', 'algfft', 'algbigint', 
 }
 
 PROJECT_DIRPATH = os.path.dirname(os.path.abspath(__file__))
