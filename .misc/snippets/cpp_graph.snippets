@@ -451,14 +451,14 @@ endsnippet
 snippet algtarjanscc "Tarjan's strongly connected components algorithm"
 vector<vector<int>> tarjanSCC(const vector<vector<int>>& edges) {
 	struct Vertex {
-		int vid;
+		int vid = -1;
 		int index = -1;
 		bool processed = false;
 	};
 	vector<vector<int>> res;
 	stack<Vertex*> S;
 	vector<Vertex> vertices(edges.size());
-	for (int i = 0; i < edges.size(); ++i) {
+	for (size_t i = 0; i < edges.size(); ++i) {
 		vertices[i].vid = i;
 	}
 	int index = 0;

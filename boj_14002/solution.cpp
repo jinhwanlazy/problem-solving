@@ -1,6 +1,49 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+class LIS {
+  using T = int;
+ public:
+  vector<T> arr;
+  vector<T> trace;
+  size_t length;
+  
+  LIS(const vector<T>& arr) : arr(arr), trace(0), length(0) {}
+
+  size_t solve() {
+    vector<T> tmp = {numeric_limits<int>::min()};
+    trace.resize(arr.size(), 0);
+
+    for (size_t i = 0; i < arr.size(); ++i) {
+      int a = arr[i];
+      if (tmp.back() < a) {
+        trace[i] = tmp.size();
+        tmp.push_back(a);
+      } else {
+        auto j = lower_bound(tmp.begin(), tmp.end(), a) - tmp.begin();
+        trace[i] = j;
+        tmp[j] = a;
+      }
+    }
+    length = tmp.size() - 1;
+    return length;
+  }
+
+  vector<int> indices() const {
+    int t = length;
+    vector<int> res;
+    for (int i = trace.size() - 1; i >= 0; --i) {
+      if (trace[i] == t) {
+        res.push_back(i);
+        t--;
+      }
+    }
+    
+    reverse(res.begin(), res.end());
+    return res;
+  }
+};
+
 int main() {
   int N;
   scanf("%d", &N);
@@ -10,33 +53,11 @@ int main() {
     scanf("%d", &A[i]);
   }
 
-  vector<int> LIS{numeric_limits<int>::min()};
-  vector<int> trace(N);
+  LIS lis(A);
+  printf("%lu\n", lis.solve());
 
-  for (int i = 0; i < N; ++i) {
-    int a = A[i];
-    if (LIS.back() < a) {
-      trace[i] = LIS.size();
-      LIS.push_back(a);
-    } else {
-      auto j = lower_bound(LIS.begin(), LIS.end(), a) - LIS.begin();
-      trace[i] = j;
-      LIS[j] = a;
-    }
-  }
-
-  printf("%ld\n", LIS.size() - 1);
-  int t = LIS.size() - 1;
-  vector<int> ans;
-  for (int i = trace.size() - 1; i >= 0; --i) {
-    if (trace[i] == t) {
-      ans.push_back(A[i]);
-      t--;
-    }
-  }
-  sort(ans.begin(), ans.end());
-  for (int i = 0; i < ans.size(); ++i) {
-    printf("%d ", ans[i]);
+  for (int i : lis.indices()) {
+    printf("%d ", A[i]);
   }
   printf("\n");
 
