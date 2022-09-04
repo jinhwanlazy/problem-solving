@@ -27,8 +27,8 @@ $$
 
 $$
 \begin{align}
-{n \choose k} &\equiv \prod_{i=k+1}^{n}i \(n-k\)!^{-1} \mod P \\
-              &\equiv \prod_{i=k+1}^{n}i \(n-k\)!^{P-2} \mod P
+{n \choose k} &\equiv \left( \prod_{i=k+1}^{n}i \right) \(n-k\)!^{-1} \mod P \\
+              &\equiv \left( \prod_{i=k+1}^{n}i \right) \(n-k\)!^{P-2} \mod P
 \end{align}
 $$
 
