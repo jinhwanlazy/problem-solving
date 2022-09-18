@@ -57,6 +57,7 @@ They are located under [`.misc/snippets/`](.misc/snippets/)
 | ---- | ---- |
 | [BOJ1074 - Z](boj_1074) | morton code, Z-order |
 | [BOJ5977 - Mowing the Lawn](boj_5977) | deque, deque dp, dp, ds |
+| [BOJ11401 - 이항 계수 3](boj_11401) | combinatorics, exponentiation by squaring, fermat's little thm, math, modular multiplicative inverse, number theory |
 | [BOJ15678 - 연세워터파크](boj_15678) | deque, deque dp, dp, ds, priority queue, segtree |
 | [Foobar - Power Hungry](foobar_power-hungry) | dp |
 
