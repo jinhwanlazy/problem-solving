@@ -1,8 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-struct Sieve
-{
+struct Sieve {
   Sieve(size_t max_size) : data_(max_size, true) {
     data_[0] = false;
     data_[1] = false;

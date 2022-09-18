@@ -21,7 +21,7 @@ They are located under [`.misc/snippets/`](.misc/snippets/)
 | ------- | ----------- | ------- |
 | [algdijkstra](.misc/snippets/cpp_graph.snippets#L14) | Dijkstra's shortest path algorithm | [boj_1753](boj_1753) |
 | [algbellman](.misc/snippets/cpp_graph.snippets#L89) | Bellman-Ford, shortest path algorithm. | [boj_1865](boj_1865) [boj_11657](boj_11657) |
-| [algunionfind](.misc/snippets/cpp_graph.snippets#L228) | Union Find Set data structure | [boj_1043](boj_1043) [boj_1197](boj_1197) [boj_1647](boj_1647) [boj_1717](boj_1717) [boj_1774](boj_1774) [boj_1976](boj_1976) [boj_2162](boj_2162) [boj_2887](boj_2887) [boj_4195](boj_4195) [boj_4386](boj_4386) [boj_9372](boj_9372) [boj_10216](boj_10216) [boj_16724](boj_16724) [boj_17472](boj_17472) [boj_20040](boj_20040) |
+| [algunionfind](.misc/snippets/cpp_graph.snippets#L228) | Union Find Set data structure | [boj_1043](boj_1043) [boj_1197](boj_1197) [boj_1647](boj_1647) [boj_1774](boj_1774) [boj_2162](boj_2162) [boj_4195](boj_4195) [boj_4386](boj_4386) [boj_9372](boj_9372) [boj_10216](boj_10216) [boj_16724](boj_16724) [boj_17472](boj_17472) [boj_20040](boj_20040) |
 | [algtoposort](.misc/snippets/cpp_graph.snippets#L316) | Topological sort algorithm | [boj_1766](boj_1766) [boj_2252](boj_2252) [boj_2623](boj_2623) |
 | [algtarjanscc](.misc/snippets/cpp_graph.snippets#L451) | Tarjan's strongly connected components algorithm | [boj_2150](boj_2150) [boj_3648](boj_3648) [boj_3977](boj_3977) [boj_4013](boj_4013) [boj_4196](boj_4196) [boj_9466](boj_9466) [boj_11280](boj_11280) [boj_11281](boj_11281) [boj_16367](boj_16367) |
 | [algbipartite](.misc/snippets/cpp_graph.snippets#L530) | Bipartite matching algorithm | [boj_1014](boj_1014) [boj_1017](boj_1017) [boj_1671](boj_1671) [boj_1867](boj_1867) [boj_2188](boj_2188) [boj_11014](boj_11014) [boj_11375](boj_11375) [boj_11376](boj_11376) [boj_11377](boj_11377) [boj_11378](boj_11378) [boj_14750](boj_14750) |
@@ -31,7 +31,8 @@ They are located under [`.misc/snippets/`](.misc/snippets/)
 ## NUMBER THEORY
 | Keyword | Description | Used in |
 | ------- | ----------- | ------- |
-| [algsieve](.misc/snippets/cpp_number_theory.snippets#L1) | Sieve of Eratosthenes, finds all prime numbers in given range | [boj_1644](boj_1644) [boj_17104](boj_17104) [boj_17134](boj_17134) |
+| [algsieve](.misc/snippets/cpp_number_theory.snippets#L1) | Sieve of Eratosthenes, finds all prime numbers in given range | [boj_17104](boj_17104) [boj_17134](boj_17134) |
+| [algxgcd](.misc/snippets/cpp_number_theory.snippets#L45) | Extended euclidean algorithm | [boj_3955](boj_3955) |
 
 ## STRING
 | Keyword | Description | Used in |
@@ -42,13 +43,13 @@ They are located under [`.misc/snippets/`](.misc/snippets/)
 | Keyword | Description | Used in |
 | ------- | ----------- | ------- |
 | [alglis](.misc/snippets/cpp_others.snippets#L73) | LIS, longest incereasing subsequence algorithm | [boj_2352](boj_2352) [boj_2568](boj_2568) [boj_14002](boj_14002) |
-| [algfft](.misc/snippets/cpp_others.snippets#L118) | FFT, Fast Fourier Transform algorithm | [boj_16287](boj_16287) [boj_17104](boj_17104) [boj_17134](boj_17134) [boj_20176](boj_20176) |
+| [algfft](.misc/snippets/cpp_others.snippets#L118) | FFT, Fast Fourier Transform algorithm | [boj_1067](boj_1067) [boj_10531](boj_10531) [boj_16287](boj_16287) [boj_17104](boj_17104) [boj_17134](boj_17134) [boj_20176](boj_20176) |
 | [algbigint](.misc/snippets/cpp_others.snippets#L155) | Big integer class | [boj_15576](boj_15576) [boj_15740](boj_15740) |
 
 ## TREE
 | Keyword | Description | Used in |
 | ------- | ----------- | ------- |
-| [clssegtree](.misc/snippets/cpp_tree.snippets#L1) | Segment tree class | [boj_1168](boj_1168) [boj_2042](boj_2042) [boj_2357](boj_2357) [boj_5419](boj_5419) [boj_7626](boj_7626) [boj_9345](boj_9345) [boj_11403](boj_11403) [boj_11505](boj_11505) [boj_12899](boj_12899) [boj_14428](boj_14428) [boj_16975](boj_16975) [boj_17131](boj_17131) [cf_1679c](cf_1679c) |
+| [clssegtree](.misc/snippets/cpp_tree.snippets#L1) | Segment tree class | [boj_1168](boj_1168) [boj_2042](boj_2042) [boj_2357](boj_2357) [boj_5419](boj_5419) [boj_9345](boj_9345) [boj_11505](boj_11505) [boj_12899](boj_12899) [boj_14428](boj_14428) [boj_16975](boj_16975) [boj_17131](boj_17131) [cf_1679c](cf_1679c) |
 | [clsfenwicktree](.misc/snippets/cpp_tree.snippets#L88) | Fenwick tree, binary indexed tree | [boj_2042](boj_2042) [boj_2243](boj_2243) [boj_11012](boj_11012) |
 
 

@@ -19,7 +19,7 @@ ALGORITHMS = {
     'algunionfind', 'algtoposort', 'algtarjanscc',
 
     # number theory
-    'algsieve',
+    'algsieve', 'algxgcd', 'algmodpow',
 
     # string
     'algkmp',
@@ -96,7 +96,7 @@ class SnippetInfo:
     filepath: str
     start: int
     end: int
-    first_line: str
+    search_str: str
     used_in: List[str]
 
 
@@ -123,16 +123,18 @@ def parse_snippet_file(filepath):
             if line.startswith('snippet '):
                 m = re.match(r'^snippet\s(.*)\s"(.*)"$', line)
                 info = SnippetInfo(m.group(1), m.group(2), relpath, i+1, -1, None, [])
+                first_two_lines = []
             else:
                 continue
         elif line.startswith('endsnippet'):
             if info.keyword in ALGORITHMS:
+                info.search_str = re.sub(r'\s+', '', ''.join(first_two_lines))
                 info.used_in.extend(find_snippet_usage(info))
                 res.append(info)
             info = None
         else:
-            if info.first_line is None:
-                info.first_line = line.strip()
+            if len(first_two_lines) < 2:
+                first_two_lines.append(line)
             info.end = i+1
     return res
 
@@ -143,8 +145,8 @@ def find_snippet_usage(info):
         if not os.path.isfile(solution_filepath):
             continue
         with open(solution_filepath, 'r') as f:
-            solution = f.read()
-        if solution.find(info.first_line) != -1:
+            solution = re.sub(r'\s+', '', f.read())
+        if solution.find(info.search_str) != -1:
             res.append(os.path.basename(p))
     return res
 

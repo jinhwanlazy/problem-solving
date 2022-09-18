@@ -1,6 +1,5 @@
 snippet algsieve "Sieve of Eratosthenes, finds all prime numbers in given range"
-struct Sieve
-{
+struct Sieve {
 	Sieve(size_t max_size) : data_(max_size, true) {
 		data_[0] = false;
 		data_[1] = false;
@@ -20,4 +19,42 @@ struct Sieve
 	
 	vector<bool> data_;
 };
+endsnippet
+
+snippet modpow "modulus pow"
+template <typename T = unsigned long long, T MOD=1000000007> // modpow
+T modPow(T base, T exp) {
+	if (exp == 0) {
+		return 1;
+	}
+	if (exp == 1) {
+		return base % MOD;
+	}
+	
+	T res = modPow(base, exp / 2);
+	res = res * res;
+	res %= MOD;
+	if (exp & 1) {
+		res *= base;
+		res %= MOD;
+	}
+	return res;
+}
+endsnippet
+
+snippet algxgcd "Extended euclidean algorithm"
+template <typename T = long long> // xgcd
+T xGCD(T a, T b, T& x, T& y) {
+	if (a < b) {
+		return xGCD(b, a, y, x);
+	}
+	if (b == 0) {
+		x = 1; y = 0;
+		return a;
+	}
+	T x_, y_, g = xGCD(b, a % b, x_, y_);
+	x = y_;
+	y = x_ - (a / b) * y_;
+	return g;
+}
 endsnippet
