@@ -4,81 +4,86 @@ using namespace std;
 using LL = long long;
 constexpr LL MOD = 1000000007;
 
-template<typename T>
+template <typename T, typename internal_t = T>
 class SegTree {
-  public:
-  vector<T> tree_;
+ public:
+  const function<internal_t()> defaultFn_;
+  const function<internal_t(const T&)> transformFn_;
+  const function<internal_t(const internal_t&, const internal_t&)> aggregateFn_;
   size_t n_;
+  vector<internal_t> tree_;
 
-  template<typename U>
-  SegTree(const vector<U>& data) {
-    n_ = data.size();
-    tree_.resize(4 * n_);
-    std::fill(tree_.begin(), tree_.end(), falseValue());
-    init(data, 0, n_-1, 1);
+  SegTree(const vector<T>& data,
+          const function<internal_t()>&& defaultFn,
+          const function<internal_t(const T&)>&& transformFn,
+          const function<internal_t(const internal_t&, const internal_t&)>&& aggregateFn)
+      : defaultFn_(defaultFn),
+        transformFn_(transformFn),
+        aggregateFn_(aggregateFn),
+        n_(data.size()),
+        tree_(4 * n_, defaultFn_()) {
+    init(data, 0, n_ - 1, 1);
   }
 
-  T query(size_t left, size_t right) {
-    return query(left, right, 1, 0, n_-1);
+  internal_t query(size_t left, size_t right) {
+    return query(left, right, 1, 0, n_ - 1);
   }
-  
-  template<typename U>
-  T update(size_t idx, const U& new_value) {
-    return update(idx, new_value, 1, 0, n_-1);
+
+  internal_t update(size_t idx, const T& newValue) {
+    return update(idx, newValue, 1, 0, n_ - 1);
   }
 
  private:
-  template<typename U>
-  T init(const vector<U>& data, size_t left, size_t right, size_t node_idx) {
+  internal_t init(const vector<T>& data,
+                  size_t left,
+                  size_t right,
+                  size_t nodeIdx) {
     if (left == right) {
-      return tree_[node_idx] = transform(data[left]);
+      return tree_[nodeIdx] = transformFn_(data[left]);
     }
     size_t mid = (left + right) / 2;
-    T res_left = init(data, left, mid, node_idx * 2);
-    T res_right = init(data, mid+1, right, node_idx * 2 + 1);
-    return tree_[node_idx] = aggregate(res_left, res_right);
+    internal_t res_left = init(data, left, mid, nodeIdx * 2);
+    internal_t res_right = init(data, mid + 1, right, nodeIdx * 2 + 1);
+    return tree_[nodeIdx] = aggregateFn_(res_left, res_right);
   }
 
-  T query(size_t left, size_t right, size_t node_idx, size_t node_left, size_t node_right) {
-    if (right < node_left || node_right < left) {
-      return falseValue();
+  internal_t query(size_t left,
+                   size_t right,
+                   size_t nodeIdx,
+                   size_t nodeLeft,
+                   size_t nodeRight) {
+    if (right < nodeLeft || nodeRight < left) {
+      return defaultFn_();
     }
-    if (left <= node_left && node_right <= right) {
-      return tree_[node_idx];
+    if (left <= nodeLeft && nodeRight <= right) {
+      return tree_[nodeIdx];
     }
-    size_t mid = (node_left + node_right) / 2;
-    T res_left = query(left, right, node_idx * 2, node_left, mid);
-    T res_right = query(left, right, node_idx * 2 + 1, mid+1, node_right);
-    return aggregate(res_left, res_right);
+    size_t mid = (nodeLeft + nodeRight) / 2;
+    internal_t res_left = query(left, right, nodeIdx * 2, nodeLeft, mid);
+    internal_t res_right =
+        query(left, right, nodeIdx * 2 + 1, mid + 1, nodeRight);
+    return aggregateFn_(res_left, res_right);
   }
 
-  template<typename U>
-  T update(size_t idx, const U& new_value, size_t node_idx, size_t node_left, size_t node_right) {
-    if (idx < node_left || node_right < idx) {
-      return tree_[node_idx];
+  internal_t update(size_t idx,
+                    const T& value,
+                    size_t nodeIdx,
+                    size_t nodeLeft,
+                    size_t nodeRight) {
+    if (idx < nodeLeft || nodeRight < idx) {
+      return tree_[nodeIdx];
     }
-    if (node_left == node_right) {
-      return tree_[node_idx] = transform(new_value);
+    if (nodeLeft == nodeRight) {
+      return tree_[nodeIdx] = transformFn_(value);
     }
-    size_t mid = (node_left + node_right) / 2;
-    T res_left = update(idx, new_value, node_idx * 2, node_left, mid);
-    T res_right = update(idx, new_value, node_idx * 2 + 1, mid+1, node_right);
-    return tree_[node_idx] = aggregate(res_left, res_right);
-  }
-
-  template<typename U>
-  static T transform(const U& v) {
-    return v % MOD;
-  }
-  
-  static T aggregate(const T& lhs, const T& rhs) {
-    return (lhs * rhs) % MOD;
-  }
-
-  static T falseValue() {
-    return 1;
+    size_t mid = (nodeLeft + nodeRight) / 2;
+    internal_t res_left = update(idx, value, nodeIdx * 2, nodeLeft, mid);
+    internal_t res_right =
+        update(idx, value, nodeIdx * 2 + 1, mid + 1, nodeRight);
+    return tree_[nodeIdx] = aggregateFn_(res_left, res_right);
   }
 };
+
 
 int main() {
   int N, M, K;
@@ -89,7 +94,11 @@ int main() {
     scanf("%lld", &arr[i]);
   }
 
-  SegTree<LL> tree(arr);
+  SegTree<LL> tree(arr,
+      [&]() { return 1; },
+      [&](const LL& v) { return v % MOD; },
+      [&](const LL& l, const LL& r) { return (l * r) % MOD; }
+    );
 
   for (int i = 0; i < M+K; ++i) {
     LL a, b, c;
