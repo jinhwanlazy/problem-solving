@@ -29,11 +29,11 @@
 // 17.4.1.2 Headers
 
 // C
-#ifndef _GLIBCXX_NO_ASSERT
-#include <cassert>
-#endif
-#include <cctype>
-#include <cerrno>
+//#ifndef _GLIBCXX_NO_ASSERT
+//#include <cassert>
+//#endif
+//#include <cctype>
+//#include <cerrno>
 #include <cfloat>
 #include <ciso646>
 #include <climits>
@@ -138,14 +138,14 @@
 #include <compare>
 #include <concepts>
 #if __cpp_impl_coroutine
-# include <coroutine>
+//# include <coroutine>
 #endif
 #include <latch>
 #include <numbers>
 #include <ranges>
 #include <span>
-#include <stop_token>
+//#include <stop_token>
 #include <semaphore>
-#include <syncstream>
+//#include <syncstream>
 #include <version>
 #endif

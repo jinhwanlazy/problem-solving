@@ -78,7 +78,7 @@ class CppSolution(Solution):
 
     def build(self):
         start_time = datetime.now()
-        cmd = ['g++-11', 
+        cmd = ['g++-12', 
             '-O2',
             '-std=c++20',
             '-Wall', 
@@ -135,7 +135,9 @@ class TestSample(metaclass=abc.ABCMeta):
         if self.output_type == 'str':
             return a == b
         elif self.output_type == 'float':
-            return abs(float(a) - float(b)) < self.precision
+            a = float(a.decode())
+            b = float(b.decode())
+            return abs(a - b) < self.precision
         else:
             raise NotImplementedError
             

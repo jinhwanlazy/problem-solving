@@ -3,51 +3,53 @@ from collections import deque
 N, M = map(int, input().split())
 grid = [list(map(int, input().split())) for _ in range(N)]
 
-def neighbors(i, j):
+def get_neighbors(i, j):
     for ii, jj in ((i, j + 1), (i, j - 1), (i + 1, j), (i - 1, j)):
-        if 0 <= ii < N and 0 <= jj < M:
-            yield ii, jj
+        yield ii, jj
 
-def get_borders():
-    borders = []
+def get_shores():
+    res = []
     for i, row in enumerate(grid):
         for j, x in enumerate(row):
-            if grid[i][j] == 0: 
+            if x == 0: 
                 continue
-            n_waters = sum(grid[ii][jj] == 0 for ii, jj in neighbors(i, j))
+            n_waters = sum(grid[ii][jj] == 0 for ii, jj in get_neighbors(i, j))
             if n_waters > 0:
-                borders.append((i, j, n_waters))
-    return borders
+                res.append((i, j, n_waters))
+    return res 
 
 def count_islands():
     visited = [[0] * M for _ in range(N)]
     c = 0
     for i, row in enumerate(grid):
-        for j, x in enumerate(row):
-            if grid[i][j] == 0 or visited[i][j] > 0: 
+        for j, v in enumerate(row):
+            if v == 0 or visited[i][j] > 0: 
                 continue
             c += 1
             Q = deque()
             Q.append((i, j))
             visited[i][j] = c
             while Q:
-                i, j = Q.popleft()
-                for ii, jj in neighbors(i, j):
-                    if grid[ii][jj] == 0 or visited[ii][jj] != 0:
+                y, x = Q.popleft()
+                for yy, xx in get_neighbors(y, x):
+                    if grid[yy][xx] == 0 or visited[yy][xx] > 0:
                         continue
-                    visited[ii][jj] = c
-                    Q.append((ii, jj))
+                    visited[yy][xx] = c
+                    Q.append((yy, xx))
     return c
     
 year = 0
-while count_islands() == 1:
-    borders = get_borders()
-    if not borders:
+n_islands = count_islands()
+while n_islands == 1:
+    shores = get_shores()
+    if not shores:
         break
     year += 1
-    for i, j, c in borders:
+    for i, j, c in shores:
         grid[i][j] = max(0, grid[i][j] - c)
-if count_islands() > 1:
+    n_islands = count_islands()
+
+if n_islands > 1:
     print(year)
 else:
     print(0)
