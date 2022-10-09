@@ -457,6 +457,7 @@ endsnippet
 snippet clssquare "2D Square class"
 class Square
 {
+public:
 	using T = Vec2::T;
 	
 	T left;
@@ -475,6 +476,23 @@ public:
 	bool contains(const Vec2& rhs) const {
 		return left <= rhs.x && rhs.x <= right && bottom <= rhs.y && rhs.y <= top;
 	}
+
+	bool touches(const Square& other) const {
+		if (other.right < left || right < other.left) {
+			return false;
+		}
+		if (other.top < bottom || top < other.bottom) {
+			return false;
+		}
+		if (other.left < left && right < other.right && other.bottom < bottom && top < other.top) {
+			return false;
+		}
+		if (left < other.left && other.right < right && bottom < other.bottom && other.top < top) {
+			return false;
+		}
+		return true;
+	}
+
 
 public:
 	friend istream& operator>> (istream& istr, Square& rhs) {

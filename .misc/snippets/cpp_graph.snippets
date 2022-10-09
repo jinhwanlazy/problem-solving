@@ -535,22 +535,23 @@ class BipartiteMatching {
 	vector<int> matches_;
 
  public:
-	BipartiteMatching(const vector<vector<int>>& graph, int nDst = -1) : graph_(graph), nDst_(nDst) {
-		if (nDst_ == -1) {
+	BipartiteMatching(const vector<vector<int>>& graph, size_t nDst = 0)
+			: graph_(graph), nDst_(nDst), matches_() {
+		if (nDst_ == 0) {
 			nDst_ = 0;
-			for (int i = 0; i < graph.size(); ++i) {
-				for (int w : graph[i]) {
+			for (size_t i = 0; i < graph.size(); ++i) {
+				for (size_t w : graph[i]) {
 					nDst_ = max(nDst_, (size_t)(w + 1));
 				}
 			}
 		}
-		matches_.resize(nDst, -1);
+		matches_.resize(nDst_, -1);
 	}
 
 	size_t solve() {
 		size_t res = 0;
-		vector<bool> visited(nDst_, false);
 		for (size_t i = 0; i < graph_.size(); ++i) {
+			vector<bool> visited(nDst_, false);
 			res += dfs(i, visited);
 		}
 		return res;
