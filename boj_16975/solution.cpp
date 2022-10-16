@@ -1,92 +1,94 @@
 #include <bits/stdc++.h>
-#define all(x) (x).begin(), (x).end()
-
 using namespace std;
 using LL = long long;
 
-template<typename T>
+template <typename T, typename node_t = T>
 class SegTree {
- private:
-  vector<T> tree_;
-  size_t n_;
-
  public:
-  template <typename U>
-  SegTree(const size_t size, const U& default_value)
-      : SegTree(vector<U>(size, default_value)) {}
+  size_t n_;
+  vector<node_t> tree_;
 
-  template <typename U>
-  SegTree(const vector<U>& data) {
-    n_ = data.size();
-    tree_.resize(4 * n_);
-    std::fill(tree_.begin(), tree_.end(), falseValue());
-    init(data, 0, n_ - 1, 1);
-  }
-
-  T query(size_t left, size_t right) {
+  node_t query(size_t left, size_t right) {
     return query(left, right, 1, 0, n_ - 1);
   }
 
-  template <typename U>
-  T update(size_t idx, const U& new_value) {
-    return update(idx, new_value, 1, 0, n_ - 1);
+  node_t update(size_t idx, const T& newValue) {
+    return update(idx, newValue, 1, 0, n_ - 1);
   }
 
- private:
-  template <typename U>
-  T init(const vector<U>& data, size_t left, size_t right, size_t node_idx) {
+  virtual ~SegTree() {};
+
+ protected:
+  SegTree(const vector<T>& data) : n_(data.size()), tree_(4 * n_) {}
+  
+  void init(const vector<T>& data) { init(data, 0, n_ - 1, 1); }
+
+  node_t init(const vector<T>& data,
+                  size_t left,
+                  size_t right,
+                  size_t nodeIdx) {
     if (left == right) {
-      return tree_[node_idx] = transform(data[left]);
+      return tree_[nodeIdx] = transform(data[left]);
     }
     size_t mid = (left + right) / 2;
-    T res_left = init(data, left, mid, node_idx * 2);
-    T res_right = init(data, mid + 1, right, node_idx * 2 + 1);
-    return tree_[node_idx] = aggregate(res_left, res_right);
+    node_t res_left = init(data, left, mid, nodeIdx * 2);
+    node_t res_right = init(data, mid + 1, right, nodeIdx * 2 + 1);
+    return tree_[nodeIdx] = aggregate(res_left, res_right);
   }
 
-  T query(size_t left,
-          size_t right,
-          size_t node_idx,
-          size_t node_left,
-          size_t node_right) {
-    if (right < node_left || node_right < left) {
-      return falseValue();
+  node_t query(size_t left,
+                    size_t right,
+                    size_t nodeIdx,
+                    size_t nodeLeft,
+                    size_t nodeRight) {
+    if (right < nodeLeft || nodeRight < left) {
+      return defaultValue();
     }
-    if (left <= node_left && node_right <= right) {
-      return tree_[node_idx];
+    if (left <= nodeLeft && nodeRight <= right) {
+      return tree_[nodeIdx];
     }
-    size_t mid = (node_left + node_right) / 2;
-    T res_left = query(left, right, node_idx * 2, node_left, mid);
-    T res_right = query(left, right, node_idx * 2 + 1, mid + 1, node_right);
+    size_t mid = (nodeLeft + nodeRight) / 2;
+    node_t res_left = query(left, right, nodeIdx * 2, nodeLeft, mid);
+    node_t res_right =
+        query(left, right, nodeIdx * 2 + 1, mid + 1, nodeRight);
     return aggregate(res_left, res_right);
   }
 
-  template <typename U>
-  T update(size_t idx,
-            const U& new_value,
-            size_t node_idx,
-            size_t node_left,
-            size_t node_right) {
-    if (idx < node_left || node_right < idx) {
-      return tree_[node_idx];
+  node_t update(size_t idx,
+                    const T& value,
+                    size_t nodeIdx,
+                    size_t nodeLeft,
+                    size_t nodeRight) {
+    if (idx < nodeLeft || nodeRight < idx) {
+      return tree_[nodeIdx];
     }
-    if (node_left == node_right) {
-      return tree_[node_idx] = transform(new_value);
+    if (nodeLeft == nodeRight) {
+      return tree_[nodeIdx] = transform(value);
     }
-    size_t mid = (node_left + node_right) / 2;
-    T res_left = update(idx, new_value, node_idx * 2, node_left, mid);
-    T res_right = update(idx, new_value, node_idx * 2 + 1, mid + 1, node_right);
-    return tree_[node_idx] = aggregate(res_left, res_right);
+    size_t mid = (nodeLeft + nodeRight) / 2;
+    node_t res_left = update(idx, value, nodeIdx * 2, nodeLeft, mid);
+    node_t res_right =
+        update(idx, value, nodeIdx * 2 + 1, mid + 1, nodeRight);
+    return tree_[nodeIdx] = aggregate(res_left, res_right);
   }
 
-  template <typename U>
-  static T transform(const U& v) {
-    return v;
-  }
+  virtual node_t defaultValue() const = 0;
 
-  static T aggregate(const T& lhs, const T& rhs) { return lhs + rhs; }
+  virtual node_t transform(const T& v) const = 0;
 
-  static T falseValue() { return 0; }
+  virtual node_t aggregate(const node_t& lhs, const node_t& rhs) const = 0;
+};
+
+class RangeQuery : public SegTree<LL>
+{
+public:
+  RangeQuery(const vector<LL>& data) : SegTree(data) { init(data); }
+  
+  LL defaultValue() const { return 0; }
+
+  LL transform(const LL& i) const { return i; }
+
+  LL aggregate(const LL& l, const LL& r) const { return l + r; }
 };
 
 int main() {
@@ -101,7 +103,8 @@ int main() {
   int M;
   scanf("%d", &M);
   
-  SegTree<LL> tree(N, 0);
+  vector<LL> data(N, 0);
+  RangeQuery tree(data);
 
   for (int i = 0; i < M; ++i) {
     int Q;

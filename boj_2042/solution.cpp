@@ -3,99 +3,91 @@ using namespace std;
 
 using LL = long long;
 
-template <typename T, typename internal_t = T>
+template <typename T, typename node_t = T>
 class SegTree {
+  const node_t defaultValue_;
+
+ protected:
+  virtual node_t transform(const T& v) const = 0;
+
+  virtual node_t aggregate(const node_t& lhs,
+                               const node_t& rhs) const = 0;
+
  public:
-  const function<internal_t()> defaultFn_;
-  const function<internal_t(const T&)> transformFn_;
-  const function<internal_t(const internal_t&, const internal_t&)> aggregateFn_;
   size_t n_;
-  vector<internal_t> tree_;
+  size_t width_;
+  vector<node_t> tree_;
 
-  SegTree(const vector<T>& data,
-          const function<internal_t()>&& defaultFn,
-          const function<internal_t(const T&)>&& transformFn,
-          const function<internal_t(const internal_t&, const internal_t&)>&& aggregateFn)
-      : defaultFn_(defaultFn),
-        transformFn_(transformFn),
-        aggregateFn_(aggregateFn),
-        n_(data.size()),
-        tree_(4 * n_, defaultFn_()) {
-    init(data, 0, n_ - 1, 1);
+  virtual ~SegTree(){};
+
+  SegTree(size_t n, const node_t& defaultValue)
+      : defaultValue_(defaultValue),
+        n_(n),
+        width_(1 << bit_width(n - 1)),
+        tree_(width_ * 2, defaultValue) {}
+
+  void set(size_t i, const T& val) {
+    tree_[i | width_] = transform(val);
   }
 
-  internal_t query(size_t left, size_t right) {
-    return query(left, right, 1, 0, n_ - 1);
+  void init() {
+    for (size_t i = width_ - 1; i; --i) 
+      tree_[i] = aggregate(tree_[i << 1], tree_[i << 1 | 1]);
   }
 
-  internal_t update(size_t idx, const T& newValue) {
-    return update(idx, newValue, 1, 0, n_ - 1);
+  void update(size_t i, const T& val) {
+    tree_[i |= width_] = transform(val);
+    while (i >>= 1)
+      tree_[i] = aggregate(tree_[i << 1], tree_[i << 1 | 1]);
   }
 
- private:
-  internal_t init(const vector<T>& data,
-                  size_t left,
-                  size_t right,
-                  size_t nodeIdx) {
-    if (left == right) {
-      return tree_[nodeIdx] = transformFn_(data[left]);
-    }
-    size_t mid = (left + right) / 2;
-    internal_t res_left = init(data, left, mid, nodeIdx * 2);
-    internal_t res_right = init(data, mid + 1, right, nodeIdx * 2 + 1);
-    return tree_[nodeIdx] = aggregateFn_(res_left, res_right);
-  }
+  node_t query(size_t i) const { return tree_[i | width_]; }
 
-  internal_t query(size_t left,
-                   size_t right,
-                   size_t nodeIdx,
-                   size_t nodeLeft,
-                   size_t nodeRight) {
-    if (right < nodeLeft || nodeRight < left) {
-      return defaultFn_();
+  node_t query(size_t l, size_t r) const {
+    node_t L = defaultValue_;
+    node_t R = defaultValue_;
+    for (l |= width_, r |= width_; l <= r; l >>= 1, r >>= 1) {
+      if (l & 1)
+        L = aggregate(L, tree_[l++]);
+      if (~r & 1)
+        R = aggregate(tree_[r--], R);
     }
-    if (left <= nodeLeft && nodeRight <= right) {
-      return tree_[nodeIdx];
-    }
-    size_t mid = (nodeLeft + nodeRight) / 2;
-    internal_t res_left = query(left, right, nodeIdx * 2, nodeLeft, mid);
-    internal_t res_right =
-        query(left, right, nodeIdx * 2 + 1, mid + 1, nodeRight);
-    return aggregateFn_(res_left, res_right);
-  }
-
-  internal_t update(size_t idx,
-                    const T& value,
-                    size_t nodeIdx,
-                    size_t nodeLeft,
-                    size_t nodeRight) {
-    if (idx < nodeLeft || nodeRight < idx) {
-      return tree_[nodeIdx];
-    }
-    if (nodeLeft == nodeRight) {
-      return tree_[nodeIdx] = transformFn_(value);
-    }
-    size_t mid = (nodeLeft + nodeRight) / 2;
-    internal_t res_left = update(idx, value, nodeIdx * 2, nodeLeft, mid);
-    internal_t res_right =
-        update(idx, value, nodeIdx * 2 + 1, mid + 1, nodeRight);
-    return tree_[nodeIdx] = aggregateFn_(res_left, res_right);
+    return aggregate(L, R);
   }
 };
 
+class RangeSumQuery : public SegTree<LL> {
+  using SegTree<LL>::SegTree;
+
+  LL transform(const LL& i) const { return i; }
+
+  LL aggregate(const LL& l, const LL& r) const { return l + r; }
+};
 
 template <typename T>
 class FenwickTree {
+  const T defaultValue_;
+
  public:
   vector<T> arr_;
   vector<T> tree_;
 
- public:
-  FenwickTree(size_t n) : arr_(n, defaultValue()), tree_(n, defaultValue()) {}
+  FenwickTree(int n, const T& defaultValue)
+      : defaultValue_(defaultValue),
+        arr_(n, defaultValue_),
+        tree_(n, defaultValue_) {}
 
-  FenwickTree(const vector<T>& arr) { init(arr); }
+  void set(int i, const T& val) { arr_[i] = val; }
 
- public:
+  void init() {
+    tree_ = arr_;
+    for (int i = 1, iEnd=(int)tree_.size(); i < iEnd; ++i) {
+      int j = i + LSB(i);
+      if (j < (int)tree_.size())
+        tree_[j] += tree_[i];
+    }
+  }
+
   void update(int i, const T& val) {
     T diff = val - arr_[i];
     arr_[i] = val;
@@ -106,7 +98,7 @@ class FenwickTree {
   }
 
   T query(int i) {
-    T res = defaultValue();
+    T res = defaultValue_;
     while (i > 0) {
       res += tree_[i];
       i -= LSB(i);
@@ -115,71 +107,59 @@ class FenwickTree {
   }
 
   T query(int i, int j) {
-    T res = defaultValue();
-    for (i--; j > i; j -= LSB(j)) {
+    T res = defaultValue_;
+    for (i--; j > i; j -= LSB(j))
       res += tree_[j];
-    }
-    for (; i > j; i -= LSB(i)) {
+    for (; i > j; i -= LSB(i))
       res -= tree_[i];
-    }
     return res;
   }
 
-  static inline T defaultValue() { return 0; }
-
-  static inline int LSB(int i) { return i & (-i); }
-
  private:
-  void init(const vector<T>& arr) {
-    arr_ = arr;
-    tree_ = arr;
-    for (int i = 1; i < tree_.size(); ++i) {
-      int j = i + LSB(i);
-      if (j < tree_.size())
-        tree_[j] += tree_[i];
-    }
-  }
+  static inline int LSB(int i) { return i & (-i); }
 };
 
 int main() {
   int N, M, K;
   scanf("%d %d %d", &N, &M, &K);
 
-  vector<LL> arr(N);
-  for (int i = 0; i < N; ++i) {
-    scanf("%lld", &arr[i]);
+  //RangeSumQuery rsq(N, 0);
+  //for (int i = 0; i < N; ++i) {
+    //LL v;
+    //scanf("%lld", &v);
+    //rsq.set(i, v);
+  //}
+  //rsq.init();
+  
+  //for (int i = 0; i < M + K; ++i) {
+    //LL a, b, c;
+    //scanf("%lld %lld %lld", &a, &b, &c);
+    //if (a == 1) {  // update
+      //rsq.update(b - 1, c);
+    //}
+    //if (a == 2) {  // query
+      //cout << rsq.query(b - 1, c - 1) << "\n";
+    //}
+  //}
+
+  FenwickTree<LL> tree(N+1, 0);
+  for (int i = 1; i <= N; ++i) {
+    LL v;
+    scanf("%lld", &v);
+    tree.set(i, v);
   }
-  SegTree<LL> tree(
-      arr, []() { return 0; }, [](const LL& v) { return v; },
-      [](const LL& l, const LL& r) { return l + r; });
+  tree.init();
 
   for (int i = 0; i < M + K; ++i) {
     LL a, b, c;
     scanf("%lld %lld %lld", &a, &b, &c);
-    if (a == 1) {  // update
-      tree.update(b - 1, c);
+    if (a == 1) {
+      tree.update(b, c);
     }
-    if (a == 2) {  // query
-      cout << tree.query(b - 1, c - 1) << "\n";
+    else  {
+      LL ans = tree.query(b, c);
+      printf("%lld\n", ans);
     }
   }
-
-  // vector<LL> arr(N+1);
-  // for (int i = 1; i <= N; ++i) {
-  // scanf("%lld", &arr[i]);
-  //}
-  // FenwickTree<LL> tree(arr);
-
-  // for (int i = 0; i < M + K; ++i) {
-  // LL a, b, c;
-  // scanf("%lld %lld %lld", &a, &b, &c);
-  // if (a == 1) {  // update
-  // tree.update(b, c);
-  //}
-  // if (a == 2) {  // query
-  // LL ans = tree.query(b, c);
-  // printf("%lld\n", ans);
-  //}
-  //}
   return 0;
 }

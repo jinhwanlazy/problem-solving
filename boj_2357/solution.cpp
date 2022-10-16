@@ -3,68 +3,59 @@ using namespace std;
 
 using LL = long long;
 
-template <typename T, typename internal_t = T>
+template <typename T, typename node_t = T>
 class SegTree {
  public:
-  const function<internal_t()> defaultFn_;
-  const function<internal_t(const T&)> transformFn_;
-  const function<internal_t(const internal_t&, const internal_t&)> aggregateFn_;
   size_t n_;
-  vector<internal_t> tree_;
+  vector<node_t> tree_;
 
-  SegTree(const vector<T>& data,
-          const function<internal_t()>&& defaultFn,
-          const function<internal_t(const T&)>&& transformFn,
-          const function<internal_t(const internal_t&, const internal_t&)>&& aggregateFn)
-      : defaultFn_(defaultFn),
-        transformFn_(transformFn),
-        aggregateFn_(aggregateFn),
-        n_(data.size()),
-        tree_(4 * n_, defaultFn_()) {
-    init(data, 0, n_ - 1, 1);
-  }
-
-  internal_t query(size_t left, size_t right) {
+  node_t query(size_t left, size_t right) {
     return query(left, right, 1, 0, n_ - 1);
   }
 
-  internal_t update(size_t idx, const T& newValue) {
+  node_t update(size_t idx, const T& newValue) {
     return update(idx, newValue, 1, 0, n_ - 1);
   }
 
- private:
-  internal_t init(const vector<T>& data,
+  virtual ~SegTree() {};
+
+ protected:
+  SegTree(const vector<T>& data) : n_(data.size()), tree_(4 * n_) {}
+  
+  void init(const vector<T>& data) { init(data, 0, n_ - 1, 1); }
+
+  node_t init(const vector<T>& data,
                   size_t left,
                   size_t right,
                   size_t nodeIdx) {
     if (left == right) {
-      return tree_[nodeIdx] = transformFn_(data[left]);
+      return tree_[nodeIdx] = transform(data[left]);
     }
     size_t mid = (left + right) / 2;
-    internal_t res_left = init(data, left, mid, nodeIdx * 2);
-    internal_t res_right = init(data, mid + 1, right, nodeIdx * 2 + 1);
-    return tree_[nodeIdx] = aggregateFn_(res_left, res_right);
+    node_t res_left = init(data, left, mid, nodeIdx * 2);
+    node_t res_right = init(data, mid + 1, right, nodeIdx * 2 + 1);
+    return tree_[nodeIdx] = aggregate(res_left, res_right);
   }
 
-  internal_t query(size_t left,
-                   size_t right,
-                   size_t nodeIdx,
-                   size_t nodeLeft,
-                   size_t nodeRight) {
+  node_t query(size_t left,
+                    size_t right,
+                    size_t nodeIdx,
+                    size_t nodeLeft,
+                    size_t nodeRight) {
     if (right < nodeLeft || nodeRight < left) {
-      return defaultFn_();
+      return defaultValue();
     }
     if (left <= nodeLeft && nodeRight <= right) {
       return tree_[nodeIdx];
     }
     size_t mid = (nodeLeft + nodeRight) / 2;
-    internal_t res_left = query(left, right, nodeIdx * 2, nodeLeft, mid);
-    internal_t res_right =
+    node_t res_left = query(left, right, nodeIdx * 2, nodeLeft, mid);
+    node_t res_right =
         query(left, right, nodeIdx * 2 + 1, mid + 1, nodeRight);
-    return aggregateFn_(res_left, res_right);
+    return aggregate(res_left, res_right);
   }
 
-  internal_t update(size_t idx,
+  node_t update(size_t idx,
                     const T& value,
                     size_t nodeIdx,
                     size_t nodeLeft,
@@ -73,13 +64,35 @@ class SegTree {
       return tree_[nodeIdx];
     }
     if (nodeLeft == nodeRight) {
-      return tree_[nodeIdx] = transformFn_(value);
+      return tree_[nodeIdx] = transform(value);
     }
     size_t mid = (nodeLeft + nodeRight) / 2;
-    internal_t res_left = update(idx, value, nodeIdx * 2, nodeLeft, mid);
-    internal_t res_right =
+    node_t res_left = update(idx, value, nodeIdx * 2, nodeLeft, mid);
+    node_t res_right =
         update(idx, value, nodeIdx * 2 + 1, mid + 1, nodeRight);
-    return tree_[nodeIdx] = aggregateFn_(res_left, res_right);
+    return tree_[nodeIdx] = aggregate(res_left, res_right);
+  }
+
+  virtual node_t defaultValue() const = 0;
+
+  virtual node_t transform(const T& v) const = 0;
+
+  virtual node_t aggregate(const node_t& lhs, const node_t& rhs) const = 0;
+};
+
+class RangeQuery : public SegTree<LL, pair<LL, LL>>
+{
+public:
+  RangeQuery(const vector<LL>& data) : SegTree(data) {
+    init(data);
+  }
+  
+  pair<LL, LL> defaultValue() const { return {10000000000, 0}; }
+
+  pair<LL, LL> transform(const LL& i) const { return {i, i}; }
+
+  pair<LL, LL> aggregate(const pair<LL, LL>& lhs, const pair<LL, LL>& rhs) const {
+        return {min(lhs.first, rhs.first), max(lhs.second, rhs.second)};
   }
 };
 
@@ -93,17 +106,7 @@ int main() {
     scanf("%lld", &arr[i]);
   }
 
-  SegTree<LL, pair<LL, LL>> tree(
-      arr,
-      []() -> pair<LL, LL> {
-        return {1000000000, 0};
-      },
-      [](const LL& v) -> pair<LL, LL> {
-        return {v, v};
-      },
-      [](const pair<LL, LL>& lhs, const pair<LL, LL>& rhs) -> pair<LL, LL> {
-        return {min(lhs.first, rhs.first), max(lhs.second, rhs.second)};
-      });
+  RangeQuery tree(arr);
 
   for (int i = 0; i < M; ++i) {
     LL a, b;

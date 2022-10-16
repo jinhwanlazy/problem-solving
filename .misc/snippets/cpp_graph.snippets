@@ -313,6 +313,42 @@ vector<vector<int>> buildTree(const vector<vector<int>>& edges, int root) {
 }
 endsnippet
 
+snippet algbuildtree "Build tree from a inverse tree"
+vector<vector<int>> buildTree(const vector<int>& invTree) {
+	vector<vector<int>> res(invTree.size());
+	for (size_t i = 0; i < invTree.size(); ++i) {
+		int parent = invTree[i];
+		if (parent >= 0) {
+			res[parent].push_back(i);
+		}
+	}
+	return res;
+}
+endsnippet
+
+snippet algeulertree "Euler traversal"
+int eulerTraversal(const vector<vector<int>>& tree, int root, vector<pair<int, int>>& ranges) {
+	vector<int> tmp;
+	ranges.resize(tree.size());
+	const function<void(int)> recurse = [&](int i) -> void {
+		int l = tmp.size();
+		tmp.push_back(i);
+		if (tree[i].empty()) {
+			ranges[i] = {l, l};
+			return;
+		}
+		for (int j : tree[i]) {
+			recurse(j);
+		}
+		int r = tmp.size();
+		tmp.push_back(i);
+		ranges[i] = {l, r};
+	};
+	recurse(root);
+	return tmp.size();
+}
+endsnippet
+
 snippet algtoposort "Topological sort algorithm"
 vector<int> topologicalSort(const vector<vector<int>>& graph) {
 	size_t N = graph.size();
