@@ -79,7 +79,6 @@ class CppSolution(Solution):
     def build(self):
         start_time = datetime.now()
         cmd = ['g++-12', 
-            '-O2',
             '-std=c++20',
             '-Wall', 
             '-Weffc++',
