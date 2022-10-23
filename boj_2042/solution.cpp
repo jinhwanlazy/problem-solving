@@ -10,8 +10,7 @@ class SegTree {
  protected:
   virtual node_t transform(const T& v) const = 0;
 
-  virtual node_t aggregate(const node_t& lhs,
-                               const node_t& rhs) const = 0;
+  virtual node_t aggregate(const node_t& lhs, const node_t& rhs) const = 0;
 
  public:
   size_t n_;
