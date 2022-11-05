@@ -1,0 +1,195 @@
+snippet clskdtree "KDTree"
+template <typename T, size_t DIM>
+class KDTree {
+ // largely borrowed from https://github.com/gishi523/kd-tree
+ public:
+	using point_t = Vec<T, DIM>;
+
+ private:
+	struct Node {
+		size_t ind = -1;
+		int axis = -1;
+		Node* next[2] = {nullptr};
+
+		~Node() {
+			if (next[0] != nullptr) delete next[0];
+			if (next[1] != nullptr) delete next[1];
+		}
+	};
+
+	struct KNNQueue {
+		vector<pair<T, size_t>> data_;
+		size_t k_;
+		KNNQueue(size_t k) : data_(0), k_(k) { data_.reserve(k + 1); }
+		void push(const pair<T, size_t>& x) {
+			auto it = std::lower_bound(data_.begin(), data_.end(), x);
+			data_.insert(it, x);
+			if (data_.size() > k_)
+				data_.resize(k_);
+			
+		}
+		const pair<T, size_t>& back() const { return data_.back(); };
+		const pair<T, size_t>& operator[](size_t index) const { return data_[index]; }
+		size_t size() const { return data_.size(); }
+	};
+
+	vector<point_t> points_;
+	vector<size_t> inds_;
+	Node* root_ = nullptr;
+
+ public:
+	KDTree(size_t n) : points_(n), inds_(n), root_(nullptr) {}
+
+	KDTree(const vector<point_t>& points) : KDTree(points.size()) {
+		for (size_t i = 0; i < points.size(); ++i) points_[i] = points[i];
+	}
+
+	KDTree(const KDTree&) = delete;
+	KDTree& operator= (const KDTree&) = delete;
+
+	~KDTree() {
+		if (root_ != nullptr) 
+			delete root_;
+		root_ = nullptr;
+	}
+
+	point_t& operator[](size_t i) { return points_[i]; }
+
+	void init() {
+		if (root_ != nullptr) {
+			delete root_;
+			root_ = nullptr;
+		}
+		iota(inds_.begin(), inds_.end(), 0);
+		root_ = init(inds_.data(), inds_.size(), 0);
+	}
+
+	size_t queryNN(const point_t& x) {
+		size_t ind = -1;
+		T minDist = numeric_limits<T>::max();
+		queryNN(root_, x, ind, minDist);
+		return ind;
+	}
+
+	vector<int> queryKNN(const point_t& x, int k) {
+		KNNQueue q(k);
+		queryKNN(root_, x, q, k);
+		vector<int> res;
+		res.reserve(q.size());
+		for (size_t i = 0; i < q.size(); ++i) {
+			res.push_back(q[i].second);
+		}
+		return res;
+	}
+
+ private:
+	Node* init(size_t* inds, size_t nPoints, int depth) {
+		if (nPoints <= 0)
+			return nullptr;
+
+		const int axis = depth % DIM;
+		const size_t mid = (nPoints - 1) / 2;
+
+		std::nth_element(inds, inds + mid, inds + nPoints,
+										 [&](size_t lhs, size_t rhs) {
+			return points_[lhs](axis) < points_[rhs](axis);
+		});
+
+		Node* node = new Node;
+		node->ind = inds[mid];
+		node->axis = axis;
+
+		node->next[0] = init(inds, mid, depth + 1);
+		node->next[1] = init(inds + mid + 1, nPoints - mid - 1, depth + 1);
+
+		return node;
+	}
+
+	void queryNN(const Node* node, const point_t& query, size_t& ind, T& minDist) const {
+		if (node == nullptr)
+			return;
+
+		const point_t& train = points_[node->ind];
+
+		const T dist = query.norm(train);
+		if (dist < minDist) {
+			minDist = dist;
+			ind = node->ind;
+		}
+
+		const int axis = node->axis;
+		const int dir = query(axis) < train(axis) ? 0 : 1;
+		queryNN(node->next[dir], query, ind, minDist);
+
+		const T diff = fabs(query(axis) - train(axis));
+		if (diff < minDist) 
+			queryNN(node->next[!dir], query, ind, minDist);
+	}
+
+	void queryKNN(const Node* node,
+								const point_t& query,
+								KNNQueue& q,
+								int k) const {
+		if (node == nullptr)
+			return;
+
+		const point_t& train = points_[node->ind];
+
+		const double dist = query.norm(train);
+		q.push({dist, node->ind});
+
+		const int axis = node->axis;
+		const int dir = query(axis) < train(axis) ? 0 : 1;
+		queryKNN(node->next[dir], query, q, k);
+
+		const double diff = fabs(query(axis) - train(axis));
+		if ((int)q.size() < k || diff < q.back().first)
+			queryKNN(node->next[!dir], query, q, k);
+	}
+};
+endsnippet
+
+snippet algtriad "triad method"
+template <typename T>
+Mat<T, 3, 3> triadMethod(const Vec<T, 3>& p1,
+						 const Vec<T, 3>& p2,
+						 const Vec<T, 3>& q1,
+						 const Vec<T, 3>& q2) {
+	Mat<T, 3, 3> ref, qry;
+	ref.setCol(0, p1);
+	ref.setCol(1, p1.cross(p2).normalized());
+	ref.setCol(2, ref.col(0).cross(ref.col(1)));
+	qry.setCol(0, q1);
+	qry.setCol(1, q1.cross(q2).normalized());
+	qry.setCol(2, qry.col(0).cross(qry.col(1)));
+	return ref * qry.t();
+}
+endsnippet
+
+snippet algmat2angleaxis "rotation matrix to angle axis"
+void matToAngleAxis(const Mat3& rot, double& angle, Vec3& axis) {
+	// https://math.stackexchange.com/a/110059
+	constexpr double e = 1e-9;
+	double t = rot.trace();
+	Vec3 r{rot(2, 1) - rot(1, 2),	//
+			 rot(0, 2) - rot(2, 0),	//
+			 rot(1, 0) - rot(0, 1)};
+	if (t >= 3 - e) {
+		axis = r * (0.5 - (t - 3.0) / 12.0);
+		angle = axis.norm();
+		axis /= angle;
+	}
+	else if (t > -1 + e) {
+		angle = acos((rot.trace() - 1.0) / 2.0);
+		axis = r / (2.0 * sin(angle));
+	}
+	else {
+		const double s = sqrt(rot(0, 0) - rot(1, 1) - rot(2, 2) + 1);
+		const Vec3 v{s * 0.5,											//
+					 (rot(0, 1) + rot(1, 0)) * (0.5 / s),	//
+					 (rot(0, 2) + rot(2, 0)) * (0.5 / s)};
+		angle = M_PI;
+		axis = v.normalized();
+	}
+}
+endsnippet

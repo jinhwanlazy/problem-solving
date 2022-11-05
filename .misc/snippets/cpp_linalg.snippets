@@ -7,9 +7,14 @@ class Mat {
 	Mat() {}
 	Mat(const Mat& rhs) { copy(rhs.data_, rhs.data_ + size(), this->data_); }
 	Mat(std::initializer_list<T> l) { copy(l.begin(), l.end(), this->data_); }
+	static constexpr Mat<T, R, C> zeros() {
+		return Mat<T, R, C>();
+	}
 
 	constexpr bool isVector() const { return (C == 1); }
 	constexpr size_t size() const { return R * C; }
+	constexpr size_t nCols() const { return C; }
+	constexpr size_t nRows() const { return R; }
 	constexpr void throwIfNotVector() const {
 		if constexpr (C != 1)
 			throw runtime_error("the method is defined only for vector");
@@ -18,14 +23,44 @@ class Mat {
 		if constexpr (R != C) 
 			throw runtime_error("the method is defined only for square matrix");
 	}
-	void forEach(const function<void(size_t i)>& fn) {
-		for (size_t i = 0; i < size(); ++i)
-			fn(i);
-	}
+	void forEach(const function<void(size_t i)>& fn) { for (size_t i = 0; i < size(); ++i) fn(i); }
 
 	T& operator()(size_t r, size_t c) { return data_[C * r + c]; }
 	const T& operator()(size_t r, size_t c) const { return data_[C * r + c]; }
-	const T& at(size_t r, size_t c) const { return data_[C * r + c]; }
+	T& operator()(size_t i) { throwIfNotVector(); return data_[i]; }
+	const T& operator()(size_t i) const { throwIfNotVector(); return data_[i]; }
+
+	Mat<T, 1, C> row(size_t r) const {
+		Mat<T, 1, C> res;
+		for (size_t c = 0; c < C; ++c)
+			res(0, c) = *this(r, c);
+		return res;
+	}
+
+	void setRow(size_t r, const Mat<T, 1, C>& row) {
+		for (size_t c = 0; c < C; ++c)
+			(*this)(r, c) = row(0, c);
+	}
+
+	Mat<T, R, 1> col(size_t c) const {
+		Mat<T, R, 1> res;
+		for (size_t r = 0; r < R; ++r)
+			res(r, 0) = (*this)(r, c);
+		return res;
+	}
+
+	void setCol(size_t c, const Mat<T, R, 1>& col) {
+		for (size_t r = 0; r < R; ++r)
+			(*this)(r, c) = col(r, 0);
+	}
+
+	Mat<T, R, 1> diag() const {
+		Mat<T, R, 1> res;
+		for (size_t r = 0; r < R; ++r) {
+			res(r, 1) = (*this)(r, r);
+		}
+		return res;
+	}
 
 	Mat& operator+=(const T& rhs) { forEach([&](size_t i) { this->data_[i] += rhs; }); return *this; }
 	Mat& operator-=(const T& rhs) { forEach([&](size_t i) { this->data_[i] -= rhs; }); return *this; }
@@ -44,20 +79,61 @@ class Mat {
 
 	Mat operator+(const Mat& rhs) const { Mat res(*this); res += rhs; return res; };
 	Mat operator-(const Mat& rhs) const { Mat res(*this); res -= rhs; return res; };
+	Mat operator-() const { return (*this) * -1; }
 
-	template<typename U, size_t R2, size_t C2>
-	Mat<T, R, C2> operator*(const Mat<U, R2, C2>& rhs) const { 
-		static_assert (C == R2, "shape not compatible");
+	bool operator==(const Mat& rhs) const {
+		for (size_t i = 0; i < size(); ++i)
+			if (this->data_[i] != rhs.data_[i])
+				return false;
+		return true;
+	}
+
+	template<typename U, size_t C2>
+	Mat<T, R, C2> operator*(const Mat<U, C, C2>& rhs) const { 
 		Mat<T, R, C2> res;
 		for (size_t i = 0; i < R; ++i) {
 			for (size_t j = 0; j < C2; ++j) {
 				for (size_t k = 0; k < C; ++k) {
-					res(i, j) = (*this)(i, k) * rhs(k, j);
+					res(i, j) += (*this)(i, k) * rhs(k, j);
 				}
 			}
 		}
 		return res;
 	}
+
+	friend istream& operator>>(istream& istr, Mat& m) { 
+		m.forEach([&](size_t i) { istr >> m.data_[i]; });
+		return istr;
+	}
+
+	friend ostream& operator<<(ostream& ostr, const Mat& m) { 
+		if (m.isVector()) {
+			ostr << "Vec[";
+			for (size_t r = 0; r < R; ++r) {
+				ostr << m(r) << (r == R - 1 ? "]" : ",\t");
+			}
+		}
+		else {
+			ostr << "Mat[";
+			for (size_t r = 0; r < R; ++r) {
+				ostr << (r == 0 ? "" : "		");
+				for (size_t c = 0; c < C; ++c) {
+					ostr << m(r, c) << ",\t";
+				}
+				ostr << (r == R - 1 ? "]" : "\n");
+			}
+		}
+		return ostr;
+	}
+
+	T& x() { throwIfNotVector(); return data_[0]; }
+	T& y() { throwIfNotVector(); return data_[1]; }
+	T& z() { throwIfNotVector(); return data_[2]; }
+	T& w() { throwIfNotVector(); return data_[3]; }
+	const T& x() const { throwIfNotVector(); return data_[0]; }
+	const T& y() const { throwIfNotVector(); return data_[1]; }
+	const T& z() const { throwIfNotVector(); return data_[2]; }
+	const T& w() const { throwIfNotVector(); return data_[3]; }
 
 	Mat<T, C, R> t() const {
 		Mat<T, C, R> res;
@@ -69,38 +145,39 @@ class Mat {
 		return res;
 	} 
 
+	T trace() const { throwIfNotSquare(); T res = 0; for (size_t i = 0; i < R; ++i) res += (*this)(i, i); return res; }
+
 	T det() const {
 		if constexpr (R == 2 && C == 2) {
-			return at(0, 0) * at(1, 1) - at(0, 1) * at(1, 0);
+			return (*this)(0, 0) * (*this)(1, 1) - (*this)(0, 1) * (*this)(1, 0);
 		} else if constexpr (R == 3 && C == 3) {
-			const T c00 = at(1, 1) * at(2, 2) - at(1, 2) * at(2, 1);
-			const T c10 = at(1, 2) * at(2, 0) - at(1, 0) * at(2, 2);
-			const T c20 = at(1, 0) * at(2, 1) - at(1, 1) * at(2, 0);
-			return at(0, 0) * c00 + at(0, 1) * c10 + at(0, 2) * c20;
+			const T c00 = (*this)(1, 1) * (*this)(2, 2) - (*this)(1, 2) * (*this)(2, 1);
+			const T c10 = (*this)(1, 2) * (*this)(2, 0) - (*this)(1, 0) * (*this)(2, 2);
+			const T c20 = (*this)(1, 0) * (*this)(2, 1) - (*this)(1, 1) * (*this)(2, 0);
+			return (*this)(0, 0) * c00 + (*this)(0, 1) * c10 + (*this)(0, 2) * c20;
 		} else {
 			throw runtime_error("not implemented");
 		}
 	}
 
-	friend istream& operator>>(istream& istr, Mat& m) { 
-		m.forEach([&](size_t i) { istr >> m.data_[i]; });
-		return istr;
-	}
-
-	T& operator()(size_t i) { throwIfNotVector(); return data_[i]; }
-	const T& operator()(size_t i) const { throwIfNotVector(); return data_[i]; }
-	T& x() { throwIfNotVector(); return data_[0]; }
-	T& y() { throwIfNotVector(); return data_[1]; }
-	T& z() { throwIfNotVector(); return data_[2]; }
-	T& w() { throwIfNotVector(); return data_[3]; }
-
-	T dot(const Mat& other) const {
+	T dot(const Mat& rhs) const {
 		throwIfNotVector();
 		T res = 0;
 		for (size_t i = 0; i < R; ++i)
-			res += this->data_[i] * other.data_[i];
+			res += this->data_[i] * rhs.data_[i];
 		return res;
 	}
+
+	Mat<T, R, C> cross(const Mat& rhs) const {
+		throwIfNotVector();
+		if constexpr (R == 3) {
+			return Mat({y() * rhs.z() - z() * rhs.y(),	//
+									z() * rhs.x() - x() * rhs.z(),	//
+									x() * rhs.y() - y() * rhs.x()});
+		} else {
+			throw runtime_error("not implemented");
+		}
+	};
 
 	T squaredNorm() const {
 		throwIfNotVector();
@@ -116,42 +193,45 @@ class Mat {
 	}
 
 	double norm() const { throwIfNotVector(); return sqrt(squaredNorm()); }
-	double norm(const Mat& other) const { throwIfNotVector(); return norm(*this - other); }
+	double norm(const Mat& other) const { throwIfNotVector(); return (*this - other).norm(); }
+	Mat normalized() const { throwIfNotVector(); return *this / norm(); }
 
 	Mat inverse() const {
 		throwIfNotSquare();
 		if constexpr (R == 2) {
-			T det = at(0, 0) * at(1, 1) - at(0, 1) * at(1, 0);
+			T det = (*this)(0, 0) * (*this)(1, 1) - (*this)(0, 1) * (*this)(1, 0);
 			if (det == 0) {
 				return Mat();
 			}
 			double invDet = 1.0 / det;
-			return Mat((T)(invDet * at(1, 1)), (T)(-invDet * at(0, 1)),
-								 (T)(-invDet * at(1, 0)), (T)(invDet * at(0, 0)));
+			return Mat((T)(invDet * (*this)(1, 1)), (T)(-invDet * (*this)(0, 1)),
+									(T)(-invDet * (*this)(1, 0)), (T)(invDet * (*this)(0, 0)));
 		} else if constexpr (R == 3) {
-			T c00 = at(1, 1) * at(2, 2) - at(1, 2) * at(2, 1);
-			T c10 = at(1, 2) * at(2, 0) - at(1, 0) * at(2, 2);
-			T c20 = at(1, 0) * at(2, 1) - at(1, 1) * at(2, 0);
-			T det = at(0, 0) * c00 + at(0, 1) * c10 + at(0, 2) * c20;
+			T c00 = (*this)(1, 1) * (*this)(2, 2) - (*this)(1, 2) * (*this)(2, 1);
+			T c10 = (*this)(1, 2) * (*this)(2, 0) - (*this)(1, 0) * (*this)(2, 2);
+			T c20 = (*this)(1, 0) * (*this)(2, 1) - (*this)(1, 1) * (*this)(2, 0);
+			T det = (*this)(0, 0) * c00 + (*this)(0, 1) * c10 + (*this)(0, 2) * c20;
 			if (det == 0) {
 				return Mat();
 			}
 			double invDet = 1.0 / det;
-			return Mat((T)(invDet * (c00)),
-								 (T)(invDet * (at(0, 2) * at(2, 1) - at(0, 1) * at(2, 2))),
-								 (T)(invDet * (at(0, 1) * at(1, 2) - at(0, 2) * at(1, 1))),
-								 (T)(invDet * (c10)),
-								 (T)(invDet * (at(0, 0) * at(2, 2) - at(0, 2) * at(2, 0))),
-								 (T)(invDet * (at(0, 2) * at(1, 0) - at(0, 0) * at(1, 2))),
-								 (T)(invDet * (c20)),
-								 (T)(invDet * (at(0, 1) * at(2, 0) - at(0, 0) * at(2, 1))),
-								 (T)(invDet * (at(0, 0) * at(1, 1) - at(0, 1) * at(1, 0))));
+			return Mat(
+					(T)(invDet * (c00)),
+					(T)(invDet * ((*this)(0, 2) * (*this)(2, 1) - (*this)(0, 1) * (*this)(2, 2))),
+					(T)(invDet * ((*this)(0, 1) * (*this)(1, 2) - (*this)(0, 2) * (*this)(1, 1))),
+					(T)(invDet * (c10)),
+					(T)(invDet * ((*this)(0, 0) * (*this)(2, 2) - (*this)(0, 2) * (*this)(2, 0))),
+					(T)(invDet * ((*this)(0, 2) * (*this)(1, 0) - (*this)(0, 0) * (*this)(1, 2))),
+					(T)(invDet * (c20)),
+					(T)(invDet * ((*this)(0, 1) * (*this)(2, 0) - (*this)(0, 0) * (*this)(2, 1))),
+					(T)(invDet * ((*this)(0, 0) * (*this)(1, 1) - (*this)(0, 1) * (*this)(1, 0))));
 		} else {
 			throw runtime_error("not implemented");
 		}
 	}
 };
 
+template <typename T, size_t DIM> using Vec = Mat<T, DIM, 1>;
 using Mat3 = Mat<double, 3, 3>;
-using Vec3 = Mat<double, 3, 1>;
+using Vec3 = Vec<double, 3>;
 endsnippet
