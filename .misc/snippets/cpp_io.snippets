@@ -1,3 +1,8 @@
+snippet fastio "fast cin/cout"
+ios_base::sync_with_stdio(false);
+cin.tie(NULL);
+endsnippet
+
 snippet readi "read an integer"
 int ${1:N};
 scanf("%d", &$1);
@@ -16,7 +21,7 @@ scanf("%d %d %d", &$1, &$2, &$3);
 $0
 endsnippet
 
-snippet readiii "read four integers"
+snippet readiiii "read four integers"
 int ${1:A}, ${2:B}, ${3:C}, ${4:D};
 scanf("%d %d %d %d", &$1, &$2, &$3 &$4);
 $0

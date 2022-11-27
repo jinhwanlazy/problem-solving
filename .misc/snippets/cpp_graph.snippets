@@ -40,7 +40,7 @@ class Dijkstra {
 	bool doTrace_ = false;
 
  public:
-	Dijkstra(const vector<vector<Edge>>& adjListGraph, int src)
+	Dijkstra(const vector<vector<Edge>>& adjListGraph, int src = 0)
 			: graph_(adjListGraph), costs_(adjListGraph.size()), trace_(0), src_(src) {}
 
 	void setDoTrace() { doTrace_ = true; }
