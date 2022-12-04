@@ -1,6 +1,8 @@
 import os
+import re
 import argparse
 import time
+import json
 
 import requests 
 from bs4 import BeautifulSoup 
@@ -12,7 +14,7 @@ TMP_DIRPATH = os.path.join(PROJECT_DIRPATH, '.tmp')
 parser = argparse.ArgumentParser(
         description='Download example input/outputs from boj website')
 parser.add_argument(
-        'pids', metavar='N', type=int, nargs='+', help='problem id')
+        'pids', metavar='N', type=str, nargs='+', help='problem id')
 parser.add_argument('--src', type=str, default='boj')
 parser.add_argument('--verbose', '-v', action='store_true')
 
@@ -26,7 +28,7 @@ class Problem:
         raise NotImplementedError
 
     def alt_name(self):
-        return ""
+        return self.name()
 
     def url(self):
         raise NotImplementedError
@@ -74,9 +76,6 @@ class BojProblem(Problem):
     def name(self):
         return self.name_
 
-    def alt_name(self):
-        return self.name_ko_
-    
     def url(self):
         return self.url_
 
@@ -116,9 +115,89 @@ class BojProblem(Problem):
         return res.json()
 
 
+class CfProblem(Problem):
+    def __init__(self, pid, verbose):
+        super().__init__(verbose)
+        self.pid_ = pid.lower()
+        self.verbose_ = verbose
+
+        m = re.search(r'(\d+)([a-zA-Z]+)', pid)
+        self.contest_id = int(m.group(1))
+        self.problem_id = m.group(2).upper()
+
+        self.page_url_ = "https://codeforces.com/problemset/problem/{}/{}"
+
+        self.page_ = self.get_page_()
+        self.info_ = self.get_info_()
+
+    def name(self): 
+        return f'cf_{self.pid_}'
+
+    def alt_name(self): 
+        name = self.info_.get('name', '?') 
+        rating = self.info_.get('rating', 0)
+        if rating:
+            return name + f' - {rating}'
+        return name
+
+    def url(self):
+        return self.page_url_.format(self.contest_id, self.problem_id)
+
+    def tags(self):
+        return self.info_.get('tags', [])
+
+    def get_info_(self):
+        try: 
+            return self.get_pinfo_from_cache_()
+        except:
+            try:
+                return self.get_pinfo_from_api_()
+            except Exception as e:
+                print('failed to retrieve problem info -', e)
+        return {}
+
+    @property
+    def problem_list_cache_filepath_(self):
+        return os.path.join(TMP_DIRPATH, 'cf_problems.json')
+
+    def get_pinfo_from_cache_(self):
+        print('from cache')
+        with open(self.problem_list_cache_filepath_, 'r') as f:
+            plist = json.loads(f.read())
+        for p in plist:
+            if (p['contestId'] == self.contest_id and 
+                p['index'] == self.problem_id):
+                return p
+        raise KeyError
+
+    def get_pinfo_from_api_(self):
+        print('from api')
+        api_url = 'https://codeforces.com/api/problemset.problems'
+        plist = requests.get(url=api_url).json()['result']['problems']
+        with open(self.problem_list_cache_filepath_, 'w') as f:
+            f.write(json.dumps(plist, indent=2))
+        for p in plist:
+            if (p['contestId'] == self.contest_id and 
+                p['index'] == self.problem_id):
+                return p
+        raise KeyError
+
+    def examples(self):
+        soup = BeautifulSoup(self.page_, "html.parser") 
+        for sample_test_div in soup.find_all(class_="sample-test"):
+            input_lines = sample_test_div.find(class_='input').find_all(text=True)
+            output_lines = sample_test_div.find(class_='output').find_all(text=True)
+
+            sample_input = '\n'.join(input_lines)
+            sample_output = '\n'.join(output_lines)
+            yield sample_input, sample_output
+
+
+
 def init_problem(pid, src, verbose=False):
     cls = {
         'boj': BojProblem,
+        'cf': CfProblem,
     }[src]
 
     problem = cls(pid, verbose)
@@ -138,7 +217,7 @@ def init_problem(pid, src, verbose=False):
                 f.write(out_)
 
     # generate readme.md
-    readme = f'''# [{src.upper()}{pid} - {problem.alt_name() if problem.alt_name() else problem.name()}]({problem.url()})
+    readme = f'''# [{src.upper()}{pid.upper()} - {problem.alt_name() if problem.alt_name() else problem.name()}]({problem.url()})
 <!--tags: {', '.join(problem.tags())}-->
 '''
     readme_filepath = os.path.join(problem.dirpath(), 'readme.md')
