@@ -115,6 +115,7 @@ class BojProblem(Problem):
         return res.json()
 
 
+
 class CfProblem(Problem):
     def __init__(self, pid, verbose):
         super().__init__(verbose)
@@ -184,12 +185,18 @@ class CfProblem(Problem):
 
     def examples(self):
         soup = BeautifulSoup(self.page_, "html.parser") 
-        for sample_test_div in soup.find_all(class_="sample-test"):
-            input_lines = sample_test_div.find(class_='input').find_all(text=True)
-            output_lines = sample_test_div.find(class_='output').find_all(text=True)
-
-            sample_input = '\n'.join(input_lines)
-            sample_output = '\n'.join(output_lines)
+        sample_test_div = soup.find(class_="sample-test")
+        input_divs = sample_test_div.find_all(class_='input')
+        output_divs = sample_test_div.find_all(class_='output')
+        for input_div, output_div in zip(input_divs, output_divs):
+        # for sample_test_div in soup.find_all(class_="sample-test"):
+            input_lines = input_div.find('pre').find_all(text=True)
+            output_lines = output_div.find('pre').find_all(text=True)
+            sample_input = '\n'.join(input_lines).replace('\\n', '\n').strip()
+            sample_output = '\n'.join(output_lines).replace('\\n', '\n').strip()
+            if self.verbose_:
+                print(sample_input)
+                print(sample_output)
             yield sample_input, sample_output
 
 
