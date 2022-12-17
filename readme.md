@@ -40,7 +40,7 @@ They are located under [`.misc/snippets/`](.misc/snippets/)
 | ------- | ----------- | ------- |
 | [algkmp](.misc/snippets/cpp_string.snippets#L1) | KMP, string search algorithm | [boj_1305](boj_1305) [boj_1786](boj_1786) [boj_4354](boj_4354) [boj_5525](boj_5525) |
 | [algpalindrome](.misc/snippets/cpp_string.snippets#L54) | Manaker's longest palindromic substring algorithm | [boj_13275](boj_13275) [boj_16163](boj_16163) |
-| [algzalgorithm](.misc/snippets/cpp_string.snippets#L103) | z algorithm | [boj_13713](boj_13713) |
+| [algzalgorithm](.misc/snippets/cpp_string.snippets#L103) | z algorithm | [boj_13713](boj_13713) [boj_16229](boj_16229) |
 
 ## OTHERS
 | Keyword | Description | Used in |
