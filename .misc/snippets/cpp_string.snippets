@@ -98,3 +98,38 @@ class Manacher {
 	vector<size_t> radii_;
 };
 endsnippet
+
+
+snippet algzalgorithm "z algorithm"
+template <typename array_t>
+vector<int> zAlgorithm(const array_t& s) {
+	int n = s.size();
+	vector<int> z(s.size(), 0);
+	if (s.empty())
+		return z;
+	z[0] = n;
+
+	int l = 0, r = 0;
+	for (int i = 1; i < s.size(); ++i) {
+		if (i > r) {
+			l = r = i;
+			while (r < n && s[r - l] == s[r])
+				r++;
+			z[i] = r - l;
+			r--;
+		} else {
+			int k = i - l;
+			if (z[k] < r - i + 1)
+				z[i] = z[k];
+			else {
+				l = i;
+				while (r < n && s[r - l] == s[r])
+					r++;
+				z[i] = r - l;
+				r--;
+			}
+		}
+	}
+	return z;
+}
+endsnippet

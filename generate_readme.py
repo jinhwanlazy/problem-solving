@@ -22,7 +22,7 @@ ALGORITHMS = {
     'algsieve', 'algxgcd', 'algmodpow',
 
     # string
-    'algkmp', 'algpalindrome',
+    'algkmp', 'algpalindrome', "algzalgorithm",
 
     # tree
     'clssegtree', 'clsfenwicktree',
