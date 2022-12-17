@@ -1,10 +1,11 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+template <typename array_t>
 class Manacher {
  public:
-  Manacher(const string& s)
-      : s_(2 * s.size() + 1, PAD), radii_(2 * s.size() + 1, 0) {
+  Manacher(const array_t& s)
+      : s_(2 * s.size() + 1, PADDING), radii_(2 * s.size() + 1, 0) {
     for (size_t i = 0; i < s.size(); ++i) {
       s_[2 * i + 1] = s[i];
     }
@@ -13,9 +14,9 @@ class Manacher {
   size_t solve() {
     size_t center = 0, radius = 0;
     while (center < s_.size()) {
-      while (center - (radius + 1) >= 0 &&         //
-             center + (radius + 1) < s_.size() &&  //
-             s_[center - (radius + 1)] == s_[center + (radius + 1)]) {
+      while (center - (radius + 1) >= 0 &&				 //
+              center + (radius + 1) < s_.size() &&	//
+              s_[center - (radius + 1)] == s_[center + (radius + 1)]) {
         radius++;
       }
       radii_[center] = radius;
@@ -41,10 +42,11 @@ class Manacher {
   }
 
  private:
-  const static char PAD = '|';
-  string s_;
+  static constexpr typename array_t::value_type PADDING = 0;
+  array_t s_;
   vector<size_t> radii_;
 };
+
 
 void solve() {
   string s;
