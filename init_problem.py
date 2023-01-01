@@ -50,7 +50,12 @@ class Problem:
             with open(cache_filepath, 'r') as f:
                 html = f.read()
         else:
-            res = requests.get(self.url())
+            headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'}
+            try:
+                res = requests.get(self.url(), headers=headers)
+            except Exception as e:
+                print(e)
+                raise
             assert res.status_code == 200
             html = res.text
         if html is not None:
@@ -109,7 +114,11 @@ class BojProblem(Problem):
     def get_info_(self):
         url = 'https://solved.ac/api/v3/problem/show'
         params = {'problemId': self.pid_}
-        res = requests.get(url=url, params=params)
+        try:
+            res = requests.get(url=url, params=params)
+        except Exception as e:
+            print(e)
+            raise
         if self.verbose:
             print(res.json())
         return res.json()
