@@ -6,7 +6,7 @@ import subprocess
 from glob import glob
 from datetime import datetime
 
-LANGUAGES = ['auto', 'py', 'cpp']
+LANGUAGES = ['auto', 'py', 'cpp', 'rs']
 OUT_TYPES = ['str', 'float']
 
 parser = argparse.ArgumentParser(description='Run tests for problems')
@@ -70,22 +70,18 @@ class PySolution(Solution):
     def clean(self):
         None
 
-
-class CppSolution(Solution):
+class CompiledLanguageSolution(Solution):
     def __init__(self, filepath, *args, **kwargs):
         super().__init__(filepath, *args, **kwargs)
         self.exe_filepath = os.path.join(os.path.dirname(self.filepath), 'a.out')
 
+    @abc.abstractmethod
+    def build_command(self, filepath, exe_filepath):
+        raise NotImplementedError
+
     def build(self):
         start_time = datetime.now()
-        cmd = ['clang++', 
-            '-std=c++20',
-            '-Wall', 
-            '-Weffc++',
-            '-fdiagnostics-color=always', 
-            '-I', '.misc/include', 
-            self.filepath, 
-            '-o', self.exe_filepath]
+        cmd = self.build_command(self.filepath, self.exe_filepath)
         res = subprocess.run(cmd, capture_output=True, text=True)
         print(res.stdout)
         print(res.stderr)
@@ -111,6 +107,34 @@ class CppSolution(Solution):
     def clean(self):
         os.remove(self.exe_filepath)
 
+class CppSolution(CompiledLanguageSolution):
+    def __init__(self, filepath, *args, **kwargs):
+        super().__init__(filepath, *args, **kwargs)
+
+    def build_command(self, filepath, exe_filepath):
+        return [
+            'clang++', 
+            '-std=c++20',
+            '-Wall', 
+            '-Weffc++',
+            '-fdiagnostics-color=always', 
+            '-I', '.misc/include', 
+            filepath, 
+            '-o', exe_filepath
+        ]
+
+class RustSolution(CompiledLanguageSolution):
+    def __init__(self, filepath, *args, **kwargs):
+        super().__init__(filepath, *args, **kwargs)
+
+    def build_command(self, filepath, exe_filepath):
+        return [
+            'rustc', 
+            '-O',
+            '--edition', '2021',
+            self.filepath, 
+            '-o', self.exe_filepath
+        ]
 
 class TestSample(metaclass=abc.ABCMeta):
     def __init__(self, *args, **kwargs):
@@ -215,6 +239,7 @@ def create_solution(solution_filepath, *args, **kwargs):
     return {
             '.py': PySolution,
             '.cpp': CppSolution,
+            '.rs': RustSolution,
         }[ext](solution_filepath, *args, **kwargs)
 
 
