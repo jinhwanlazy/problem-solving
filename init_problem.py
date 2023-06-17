@@ -3,6 +3,7 @@ import re
 import argparse
 import time
 import json
+import stat
 
 import requests 
 from bs4 import BeautifulSoup 
@@ -17,6 +18,10 @@ parser.add_argument(
         'pids', metavar='N', type=str, nargs='+', help='problem id')
 parser.add_argument('--src', type=str, default='boj')
 parser.add_argument('--verbose', '-v', action='store_true')
+
+
+def file_age_in_seconds(pathname):
+    return time.time() - os.stat(pathname)[stat.ST_MTIME]
 
         
 class Problem:
@@ -171,7 +176,8 @@ class CfProblem(Problem):
         return os.path.join(TMP_DIRPATH, 'cf_problems.json')
 
     def get_pinfo_from_cache_(self):
-        print('from cache')
+        if file_age_in_seconds(self.problem_list_cache_filepath_) > 3600:
+            raise
         with open(self.problem_list_cache_filepath_, 'r') as f:
             plist = json.loads(f.read())
         for p in plist:
@@ -181,7 +187,6 @@ class CfProblem(Problem):
         raise KeyError
 
     def get_pinfo_from_api_(self):
-        print('from api')
         api_url = 'https://codeforces.com/api/problemset.problems'
         plist = requests.get(url=api_url).json()['result']['problems']
         with open(self.problem_list_cache_filepath_, 'w') as f:
